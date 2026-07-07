@@ -1,0 +1,256 @@
+x-backend-env: &backend-env
+  NODE_ENV: ${BACKEND_NODE_ENV:-production}
+  HOST: 0.0.0.0
+  PORT: 3000
+  DATABASE_URL: postgresql://golx:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/golx_main
+  DATABASE_SSL: "false"
+  DB_POOL_MIN: ${DB_POOL_MIN:-0}
+  DB_POOL_MAX: ${DB_POOL_MAX:-10}
+  DB_APPLICATION_NAME: ${DB_APPLICATION_NAME:-goalix-api}
+  DB_STATEMENT_TIMEOUT_MS: ${DB_STATEMENT_TIMEOUT_MS:-30000}
+  DB_IDLE_IN_TRANSACTION_SESSION_TIMEOUT_MS: ${DB_IDLE_IN_TRANSACTION_SESSION_TIMEOUT_MS:-10000}
+  DB_LOCK_TIMEOUT_MS: ${DB_LOCK_TIMEOUT_MS:-5000}
+  REDIS_URL: redis://redis:6379
+  REDIS_REQUIRED: "true"
+  QUEUE_REDIS_FAILURE_MODE: "throw"
+  JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+  JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+  COOKIE_SECRET: ${COOKIE_SECRET:?COOKIE_SECRET is required}
+  CSRF_SECRET: ${CSRF_SECRET:?CSRF_SECRET is required}
+  JWT_ACTIVE_KID: ${JWT_ACTIVE_KID:-v1}
+  TOTP_ENCRYPTION_KEY: ${TOTP_ENCRYPTION_KEY:?TOTP_ENCRYPTION_KEY is required}
+  MFA_ENFORCED_ROLES: ${MFA_ENFORCED_ROLES:-admin,coach}
+  CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS is required}
+  STORAGE_PROVIDER: local
+  ALLOW_LOCAL_UPLOAD_STORAGE_IN_PRODUCTION: "true"
+  BACKUP_DIR: /app/backups
+  BACKUP_INTERVAL_MINUTES: ${BACKUP_INTERVAL_MINUTES:-1440}
+  BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+  BACKUP_AUTOMATION_ENABLED: ${BACKUP_AUTOMATION_ENABLED:-true}
+  BACKUP_RESTORE_ENABLED: ${BACKUP_RESTORE_ENABLED:-false}
+  PYTHON_BIN: /opt/goalix-model-venv/bin/python
+  RANKING_PYTHON_BIN: /opt/goalix-model-venv/bin/python
+  INJURY_RISK_PYTHON_BIN: /opt/goalix-model-venv/bin/python
+  RANKING_MODEL_DIR: /models/Ranking Model
+  INJURY_RISK_MODEL_DIR: /models
+
+x-node-hardening: &node-hardening
+  init: true
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_DB: golx_main
+      POSTGRES_USER: golx
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - goalix-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U golx -d golx_main"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - data
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - goalix-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - data
+
+  migrate:
+    <<: *node-hardening
+    image: goalix-backend:${GOALIX_IMAGE_TAG:-prod}
+    build:
+      context: .
+      dockerfile: golx-backend/Dockerfile
+    restart: "no"
+    environment:
+      <<: *backend-env
+      BULLMQ_ENABLED: "false"
+      BULLMQ_WORKERS_ENABLED: "false"
+      BACKGROUND_AUTOMATIONS_ENABLED: "false"
+      INJURY_RISK_AUTOMATION_ENABLED: "false"
+      NOTIFICATION_CLEANUP_ENABLED: "false"
+      DB_APPLICATION_NAME: goalix-migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["npm", "run", "migrate"]
+    networks:
+      - data
+
+  api:
+    <<: *node-hardening
+    image: goalix-backend:${GOALIX_IMAGE_TAG:-prod}
+    build:
+      context: .
+      dockerfile: golx-backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *backend-env
+      BULLMQ_ENABLED: "true"
+      BULLMQ_WORKERS_ENABLED: "false"
+      BACKGROUND_AUTOMATIONS_ENABLED: "false"
+      INJURY_RISK_AUTOMATION_ENABLED: "false"
+      NOTIFICATION_CLEANUP_ENABLED: "false"
+    expose:
+      - "3000"
+    volumes:
+      - goalix-uploads:/app/uploads
+      - goalix-backups:/app/backups
+      - ./Models:/models:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+    networks:
+      - edge
+      - data
+
+  worker:
+    <<: *node-hardening
+    image: goalix-backend:${GOALIX_IMAGE_TAG:-prod}
+    build:
+      context: .
+      dockerfile: golx-backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      <<: *backend-env
+      BULLMQ_ENABLED: "true"
+      BULLMQ_WORKERS_ENABLED: "true"
+      BACKGROUND_AUTOMATIONS_ENABLED: ${BACKGROUND_AUTOMATIONS_ENABLED:-true}
+      INJURY_RISK_AUTOMATION_ENABLED: ${INJURY_RISK_AUTOMATION_ENABLED:-true}
+      NOTIFICATION_CLEANUP_ENABLED: ${NOTIFICATION_CLEANUP_ENABLED:-true}
+      DB_APPLICATION_NAME: goalix-worker
+    volumes:
+      - goalix-uploads:/app/uploads
+      - goalix-backups:/app/backups
+      - ./Models:/models:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    command: ["node", "src/workers/run.js"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - data
+
+  frontend:
+    <<: *node-hardening
+    image: omarhossam2005/golix:${GOALIX_IMAGE_TAG:-prod}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ""
+        NEXT_PUBLIC_SOCKET_URL: ""
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      HOSTNAME: 0.0.0.0
+      GOALIX_INTERNAL_API_URL: http://api:3000
+      GOALIX_ACCESS_JWT_SECRET: ${GOALIX_ACCESS_JWT_SECRET:?GOALIX_ACCESS_JWT_SECRET must match backend JWT_SECRET}
+      NEXT_PUBLIC_API_URL: ""
+      NEXT_PUBLIC_SOCKET_URL: ""
+    expose:
+      - "3001"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+    networks:
+      - edge
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      frontend:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./ops/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ${TLS_CERT_PATH:?TLS_CERT_PATH is required}:/etc/nginx/certs/fullchain.pem:ro
+      - ${TLS_KEY_PATH:?TLS_KEY_PATH is required}:/etc/nginx/certs/privkey.pem:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - edge
+
+volumes:
+  goalix-postgres-data:
+  goalix-redis-data:
+  goalix-uploads:
+  goalix-backups:
+
+networks:
+  edge:
+  data:
+    internal: true

@@ -1,0 +1,176 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: golix-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  DOCKERHUB_USERNAME: omarhossam2005
+  DOCKER_IMAGE: omarhossam2005/golix
+
+jobs:
+  validate:
+    name: Build, Test, And Validate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: golx_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d golx_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7.4-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/golx_test
+      REDIS_URL: redis://localhost:6379
+      JWT_SECRET: ci-access-secret-4f9872e6b32a41f0b57c
+      JWT_REFRESH_SECRET: ci-refresh-secret-70e2fd22a4c14ef8a9
+      COOKIE_SECRET: ci-cookie-secret-6ec3d4e08f4249f39d7c
+      CSRF_SECRET: ci-csrf-secret-dc9af1a425364c51b931
+      QR_ATTENDANCE_SECRET: ci-qr-secret-4bb949702de64db6a710
+      TOTP_ENCRYPTION_KEY: d5f4a9b113be456098eecb1a99506502d1c89f5a07e6b9434df336f2b2f8c4a1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up frontend Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json') }}-
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Run quality validation
+        run: npm run quality
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+
+      - name: Set up backend Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: golx-backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: golx-backend
+        run: npm ci
+
+      - name: Run backend migrations
+        working-directory: golx-backend
+        run: npm run migrate
+
+      - name: Lint backend
+        working-directory: golx-backend
+        run: npm run lint
+
+      - name: Test backend
+        working-directory: golx-backend
+        run: npm test -- --runInBand
+
+      - name: Audit backend dependencies
+        working-directory: golx-backend
+        run: npm audit --audit-level=high
+
+      - name: Validate production Compose file
+        env:
+          BACKEND_NODE_ENV: production
+          POSTGRES_PASSWORD: ci-postgres-password
+          JWT_SECRET: ci-jwt-secret-32-characters-minimum
+          JWT_REFRESH_SECRET: ci-refresh-secret-32-characters-minimum
+          COOKIE_SECRET: ci-cookie-secret-32-characters-minimum
+          CSRF_SECRET: ci-csrf-secret-32-characters-minimum
+          TOTP_ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+          CORS_ORIGINS: https://golix.example.com
+          GOALIX_ACCESS_JWT_SECRET: ci-jwt-secret-32-characters-minimum
+          TLS_CERT_PATH: ./certificates/local-fullchain.pem
+          TLS_KEY_PATH: ./certificates/local-privkey.pem
+        run: docker compose -f docker-compose.prod.yml config --quiet
+
+  publish:
+    name: Build And Push Docker Hub Image
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate Docker tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            NEXT_PUBLIC_API_URL=
+            NEXT_PUBLIC_SOCKET_URL=
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

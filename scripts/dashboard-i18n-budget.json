@@ -1,0 +1,14 @@
+{
+  "maxFindings": 0,
+  "scope": [
+    "app/admin",
+    "app/coach",
+    "app/player",
+    "app/parent",
+    "components/layout",
+    "components/chat",
+    "components/parents",
+    "components/custom-data"
+  ],
+  "note": "Dashboard pages should not ship visible static English text outside intentionally deferred payment routes."
+}

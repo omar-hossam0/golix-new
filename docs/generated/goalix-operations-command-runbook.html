@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>Goalix Operations Command Runbook</title>
+<style>
+  @page { size: A4; margin: 15mm 12mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    color: #162033;
+    background: #eef3f5;
+    line-height: 1.55;
+  }
+  .page {
+    background: #fff;
+    min-height: 100vh;
+  }
+  .cover {
+    min-height: 265mm;
+    padding: 24mm 18mm;
+    color: #06111f;
+    background:
+      linear-gradient(135deg, rgba(182,255,0,.92), rgba(34,211,238,.78)),
+      linear-gradient(45deg, #0b1f2f, #122c3f);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::after {
+    content: "";
+    position: absolute;
+    inset-inline-end: -50mm;
+    inset-block-end: -50mm;
+    width: 150mm;
+    height: 150mm;
+    border-radius: 50%;
+    border: 18mm solid rgba(255,255,255,.23);
+  }
+  .brand {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.65);
+    font-weight: 800;
+    letter-spacing: .04em;
+  }
+  .cover h1 {
+    position: relative;
+    max-width: 160mm;
+    margin: 32mm 0 8mm;
+    font-size: 42px;
+    line-height: 1.15;
+    letter-spacing: 0;
+  }
+  .cover p {
+    position: relative;
+    max-width: 155mm;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .meta-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 24mm;
+  }
+  .meta {
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.65);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .meta b { display: block; font-size: 12px; color: #315060; }
+  .meta span { display: block; margin-top: 4px; font-size: 14px; font-weight: 800; }
+  .content { padding: 14mm 13mm; }
+  .toc, .principles, .chapter, .incident-section, .env-section {
+    page-break-inside: avoid;
+    margin-bottom: 12mm;
+  }
+  h2 {
+    margin: 0 0 5mm;
+    font-size: 22px;
+    color: #0e2336;
+    border-bottom: 3px solid #b6ff00;
+    padding-bottom: 6px;
+  }
+  h3 {
+    margin: 7mm 0 3mm;
+    font-size: 16px;
+    color: #104d5f;
+  }
+  .lead {
+    margin: 0 0 8mm;
+    color: #405160;
+    font-size: 14px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 8mm 0;
+  }
+  .card {
+    border-radius: 10px;
+    border: 1px solid #d7e1e7;
+    background: #f8fbfc;
+    padding: 10px 12px;
+    min-height: 32mm;
+  }
+  .card b { display: block; color: #0e3446; margin-bottom: 4px; }
+  .card span { color: #536372; font-size: 12px; }
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 5mm;
+    table-layout: fixed;
+    direction: rtl;
+    page-break-inside: auto;
+  }
+  th {
+    background: #0e2336;
+    color: white;
+    font-size: 12px;
+    padding: 9px 8px;
+    text-align: right;
+  }
+  td {
+    border-bottom: 1px solid #dce6eb;
+    border-inline-start: 1px solid #edf2f4;
+    padding: 8px;
+    vertical-align: top;
+    font-size: 11.4px;
+    overflow-wrap: anywhere;
+  }
+  tr:nth-child(even) td { background: #f7fafb; }
+  th:first-child { border-start-start-radius: 8px; }
+  th:last-child { border-start-end-radius: 8px; }
+  .goal { font-weight: 800; color: #173044; width: 24%; }
+  td:nth-child(2), th:nth-child(2) { width: 42%; direction: ltr; text-align: left; }
+  td:nth-child(3), th:nth-child(3) { width: 34%; }
+  code {
+    display: block;
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: plaintext;
+    white-space: pre-wrap;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 10.6px;
+    color: #062334;
+    background: #eaf5f6;
+    border: 1px solid #cde5e8;
+    border-radius: 7px;
+    padding: 6px 7px;
+  }
+  .green h2 { border-color: #7bea28; }
+  .blue h2 { border-color: #22d3ee; }
+  .lime h2 { border-color: #b6ff00; }
+  .orange h2 { border-color: #ffb020; }
+  .red h2 { border-color: #ff4d4d; }
+  .purple h2 { border-color: #a78bfa; }
+  .cyan h2 { border-color: #06b6d4; }
+  .gray h2 { border-color: #64748b; }
+  .callout {
+    border: 1px solid #f3c36d;
+    background: #fff7e6;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 6mm 0;
+    color: #593b00;
+  }
+  .danger {
+    border-color: #ffb4b4;
+    background: #fff1f1;
+    color: #6b1111;
+  }
+  .ok {
+    border-color: #b6ff00;
+    background: #f4ffe2;
+    color: #224100;
+  }
+  .incident-section table td:nth-child(1), .incident-section table th:nth-child(1) { width: 28%; }
+  .incident-section table td:nth-child(2), .incident-section table th:nth-child(2) { width: 42%; direction: rtl; text-align: right; }
+  .incident-section table td:nth-child(3), .incident-section table th:nth-child(3) { width: 30%; direction: ltr; text-align: left; }
+  .footer-note {
+    margin-top: 10mm;
+    color: #657482;
+    font-size: 11px;
+    text-align: center;
+  }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+  <main class="page">
+    <section class="cover">
+      <div class="brand">GOALIX OPERATIONS</div>
+      <h1>دليل أوامر التشغيل والطوارئ والنسخ الاحتياطي</h1>
+      <p>Runbook عملي لإدارة Goalix في التطوير والإنتاج: تشغيل الخدمات، إصلاح الحالات الشائعة، أول أدمن بعد داتابيز فاضية، backup/restore، الاختبارات، والجودة.</p>
+      <div class="meta-grid">
+        <div class="meta"><b>المشروع</b><span>Goalix</span></div>
+        <div class="meta"><b>آخر تحديث</b><span>07 July 2026</span></div>
+        <div class="meta"><b>النطاق</b><span>Dev + Production + DR</span></div>
+      </div>
+    </section>
+
+    <section class="content">
+      <section class="principles">
+        <h2>قواعد تشغيل سريعة قبل أي أمر</h2>
+        <p class="lead">اعتبر هذا الدليل نقطة البداية وقت الضغط. اقرأ الحالة، نفذ الأمر، ثم راقب اللوجات. أوامر restore وbootstrap مؤثرة ويجب تنفيذها من شخص موثوق.</p>
+        <div class="cards">
+          <div class="card"><b>لا تعمل Restore بلا Backup</b><span>زر restore والـ CLI destructive. النظام ينشئ safety backup قبل restore من الواجهة، لكن في الطوارئ خذ نسخة يدوية لو أمكن.</span></div>
+          <div class="card"><b>Worker هو مكان الأتمتة</b><span>الـ backup التلقائي، cleanup، lifecycle، queues يجب أن تعمل على worker وليس API container.</span></div>
+          <div class="card"><b>MFA للأدمن والمدرب</b><span>أول أدمن يتم إنشاؤه بالـ bootstrap ثم يجبره النظام على إعداد MFA قبل استخدام admin panel بالكامل.</span></div>
+        </div>
+        <div class="callout ok"><b>مسار التشغيل الطبيعي:</b> env جاهز -> migrations -> bootstrap admin عند الحاجة -> worker شغال -> backup automatic -> verify قبل deploy.</div>
+        <div class="callout danger"><b>تحذير:</b> لو الداتابيز اتمسحت بالكامل، زر Settings لن يفتح لأن login نفسه يعتمد على الداتابيز. استخدم restore CLI من السيرفر أو Docker worker.</div>
+      </section>
+
+      <section class="toc">
+        <h2>الفهرس العملي</h2>
+        <div class="cards">
+          <div class="card"><b>1. 1. تشغيل التطوير المحلي</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div><div class="card"><b>2. 2. تشغيل الإنتاج Docker</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div><div class="card"><b>3. 3. Backend وDatabase</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div><div class="card"><b>4. 4. أول Admin بعد داتابيز فاضية</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div><div class="card"><b>5. 5. Backup وRestore</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div><div class="card"><b>6. 6. Data Lifecycle وJobs</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div><div class="card"><b>7. 7. الجودة والاختبارات والأمان</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div><div class="card"><b>8. 8. Deploy وأدوات مساعدة</b><span>أوامر وحالات جاهزة للتنفيذ.</span></div>
+        </div>
+      </section>
+
+      
+    <section class="chapter green">
+      <h2>1. تشغيل التطوير المحلي</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">تجهيز Redis فقط</td>
+              <td><code>npm run infra:up</code></td>
+              <td>يشغل Redis من docker-compose.dev.yml على localhost:6379.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">إيقاف Redis المحلي</td>
+              <td><code>npm run infra:down</code></td>
+              <td>يوقف خدمات التطوير ويحافظ على أو يمسح حسب Docker compose behavior.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">حالة Redis</td>
+              <td><code>npm run infra:status</code></td>
+              <td>يعرض حالة container الخاص بـ Redis.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تحرير بورتات التطوير</td>
+              <td><code>npm run free:dev-ports</code></td>
+              <td>مفيد لو 3000/3001/6379 متعلقة من تشغيل سابق.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تجهيز موديلات Python</td>
+              <td><code>npm run models:setup</code></td>
+              <td>يتأكد من جاهزية ملفات ومتطلبات نماذج الذكاء الاصطناعي.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل النظام كامل Dev</td>
+              <td><code>npm run dev</code></td>
+              <td>يشغل frontend + backend + المتطلبات حسب scripts/dev.js.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل Dev HTTPS</td>
+              <td><code>npm run dev:https</code></td>
+              <td>نفس dev لكن بشهادات HTTPS للتجارب التي تحتاج Secure Context.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل Frontend فقط</td>
+              <td><code>npm run dev:frontend</code></td>
+              <td>Next.js فقط على 0.0.0.0:3001.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل Backend فقط</td>
+              <td><code>npm run dev:backend</code></td>
+              <td>يدخل golx-backend ويشغل nodemon.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">عرض روابط LAN</td>
+              <td><code>npm run lan:info</code></td>
+              <td>يعرض روابط الشبكة المحلية بعد التشغيل.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تجهيز LAN access</td>
+              <td><code>npm run lan:setup</code></td>
+              <td>يضبط إعدادات ويندوز/Firewall حسب السكريبت.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+    <section class="chapter blue">
+      <h2>2. تشغيل الإنتاج Docker</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">بناء وتشغيل الإنتاج</td>
+              <td><code>docker compose -f docker-compose.prod.yml up -d --build</code></td>
+              <td>يبني frontend/backend ويشغل postgres, redis, migrate, api, worker, frontend, nginx.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">عرض حالة الخدمات</td>
+              <td><code>docker compose -f docker-compose.prod.yml ps</code></td>
+              <td>أول أمر تشخيص بعد deploy.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">متابعة اللوجات</td>
+              <td><code>docker compose -f docker-compose.prod.yml logs -f api worker frontend nginx</code></td>
+              <td>راقب الإقلاع، الـ health checks، وأخطاء migrations.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">إعادة تشغيل API</td>
+              <td><code>docker compose -f docker-compose.prod.yml restart api</code></td>
+              <td>لو غيرت env أو الخدمة علقت.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">إعادة تشغيل worker</td>
+              <td><code>docker compose -f docker-compose.prod.yml restart worker</code></td>
+              <td>لو queues أو automations وقفت.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">إيقاف الإنتاج</td>
+              <td><code>docker compose -f docker-compose.prod.yml down</code></td>
+              <td>يوقف containers بدون حذف volumes.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل migration يدوي</td>
+              <td><code>docker compose -f docker-compose.prod.yml run --rm migrate</code></td>
+              <td>يشغل خدمة migrate مرة واحدة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">فتح shell داخل API</td>
+              <td><code>docker compose -f docker-compose.prod.yml exec api sh</code></td>
+              <td>للتشخيص من داخل الشبكة الداخلية.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">فتح shell داخل worker</td>
+              <td><code>docker compose -f docker-compose.prod.yml exec worker sh</code></td>
+              <td>مفيد للـ backup وjobs.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+    <section class="chapter lime">
+      <h2>3. Backend وDatabase</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">تشغيل backend dev</td>
+              <td><code>cd golx-backend &amp;&amp; npm run dev</code></td>
+              <td>nodemon على src/server.js.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل backend production محلي</td>
+              <td><code>cd golx-backend &amp;&amp; npm start</code></td>
+              <td>يشغل src/server.js مباشرة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل worker</td>
+              <td><code>cd golx-backend &amp;&amp; npm run worker</code></td>
+              <td>يشغل BullMQ workers والـ background automations.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تطبيق migrations</td>
+              <td><code>cd golx-backend &amp;&amp; npm run migrate</code></td>
+              <td>لازم بعد أي migration جديد.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Rollback آخر migration</td>
+              <td><code>cd golx-backend &amp;&amp; npm run migrate:rollback</code></td>
+              <td>استخدمه بحذر في staging أكثر من production.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">إنشاء migration</td>
+              <td><code>cd golx-backend &amp;&amp; npm run migrate:make -- migration_name</code></td>
+              <td>لإضافة migration جديدة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل كل seeds</td>
+              <td><code>cd golx-backend &amp;&amp; npm run seed</code></td>
+              <td>يشغل seeds من فولدر seeds.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Seed أول Admin فقط</td>
+              <td><code>cd golx-backend &amp;&amp; npm run seed:admin</code></td>
+              <td>بديل legacy يعتمد على bootstrap admin الجديد.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">اختبار backend</td>
+              <td><code>cd golx-backend &amp;&amp; npm test</code></td>
+              <td>Jest runInBand.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Lint backend</td>
+              <td><code>cd golx-backend &amp;&amp; npm run lint</code></td>
+              <td>ESLint على src.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Audit بنية الداتابيز</td>
+              <td><code>cd golx-backend &amp;&amp; npm run db:audit</code></td>
+              <td>يفحص مؤشرات/معمارية الداتابيز.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Audit صارم</td>
+              <td><code>cd golx-backend &amp;&amp; npm run db:audit:strict</code></td>
+              <td>يفشل عند مشاكل معماريّة معينة.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+    <section class="chapter orange">
+      <h2>4. أول Admin بعد داتابيز فاضية</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">إنشاء أول Academy Owner</td>
+              <td><code>$env:BOOTSTRAP_ADMIN_EMAIL="owner@example.com"; $env:BOOTSTRAP_ADMIN_USERNAME="admin"; $env:BOOTSTRAP_ADMIN_PASSWORD="StrongPass#123"; $env:BOOTSTRAP_ACADEMY_NAME="Goalix Academy"; cd golx-backend; npm run bootstrap:admin</code></td>
+              <td>ينشئ الأكاديمية، أول أدمن، IAM roles، admin_accounts، ويترك MFA مطلوب على أول دخول.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Recovery لو أدمن موجود وتريد تحديثه</td>
+              <td><code>$env:BOOTSTRAP_ADMIN_ALLOW_EXISTING="true"; npm run bootstrap:admin</code></td>
+              <td>استخدمه فقط لو أنت متأكد أنه recovery شرعي.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Docker bootstrap</td>
+              <td><code>docker compose -f docker-compose.prod.yml run --rm -e BOOTSTRAP_ADMIN_PASSWORD="StrongPass#123" -e BOOTSTRAP_ADMIN_EMAIL="owner@example.com" -e BOOTSTRAP_ACADEMY_NAME="Goalix Academy" api npm run bootstrap:admin</code></td>
+              <td>ينفذ bootstrap داخل شبكة Docker بعد migrations.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">بعد إنشاء الأدمن</td>
+              <td><code>افتح /admin-login ثم فعّل MFA من /admin/settings</code></td>
+              <td>النظام يسمح بالدخول الأول لكنه يقفل admin panel على Settings حتى تفعيل 2FA.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+    <section class="chapter red">
+      <h2>5. Backup وRestore</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">Backup يدوي محلي</td>
+              <td><code>cd golx-backend; $env:DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/golx_main"; $env:BACKUP_DIR="D:\\goalix-backups"; npm run backup:db</code></td>
+              <td>ينتج .dump و .sha256.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Backup داخل Docker</td>
+              <td><code>docker compose -f docker-compose.prod.yml exec worker npm run backup:db</code></td>
+              <td>يكتب داخل /app/backups على volume goalix-backups.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Restore من CLI</td>
+              <td><code>cd golx-backend; $env:CONFIRM_RESTORE="RESTORE GOALIX"; npm run restore:db -- golx_golx_main_auto_2026-07-07T10-00-00.dump</code></td>
+              <td>يستخدم pg_restore --clean --if-exists. عملية destructive.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Restore داخل Docker</td>
+              <td><code>docker compose -f docker-compose.prod.yml exec -e CONFIRM_RESTORE="RESTORE GOALIX" worker npm run restore:db -- /app/backups/file.dump</code></td>
+              <td>لما التطبيق مش قادر يفتح Settings.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تفعيل زر Restore في Settings</td>
+              <td><code>BACKUP_RESTORE_ENABLED=true</code></td>
+              <td>مقفول افتراضيا في production. يحتاج password + عبارة RESTORE GOALIX.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تغيير تكرار auto backup</td>
+              <td><code>BACKUP_INTERVAL_MINUTES=1440</code></td>
+              <td>القيمة الافتراضية يوميا. 15 تعني كل 15 دقيقة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تغيير مدة الاحتفاظ</td>
+              <td><code>BACKUP_RETENTION_DAYS=14</code></td>
+              <td>يحذف النسخ الأقدم عند تشغيل backup جديد.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تعطيل auto backup</td>
+              <td><code>BACKUP_AUTOMATION_ENABLED=false</code></td>
+              <td>الـ manual backup يظل متاحا.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">فحص عدم commit dumps</td>
+              <td><code>npm run security:scan-dumps</code></td>
+              <td>يفشل لو dump files اتتبعت في Git.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Sanitize dump للتسليم</td>
+              <td><code>cd golx-backend &amp;&amp; npm run dump:sanitize -- input.sql output.sql</code></td>
+              <td>يمسح/يموه بيانات حساسة في plain SQL dumps.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+    <section class="chapter purple">
+      <h2>6. Data Lifecycle وJobs</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">تقرير lifecycle</td>
+              <td><code>cd golx-backend &amp;&amp; npm run data:lifecycle:report</code></td>
+              <td>يعرض المرشحين للأرشفة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Dry run</td>
+              <td><code>cd golx-backend &amp;&amp; npm run data:lifecycle:dry-run</code></td>
+              <td>يختبر بدون تعديل فعلي.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل lifecycle</td>
+              <td><code>cd golx-backend &amp;&amp; npm run data:lifecycle:run</code></td>
+              <td>ينقل/ينظف حسب السياسات.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تفعيل lifecycle تلقائي</td>
+              <td><code>DATA_LIFECYCLE_ENABLED=true</code></td>
+              <td>فعله على worker واحد فقط.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تفعيل background automations</td>
+              <td><code>BACKGROUND_AUTOMATIONS_ENABLED=true</code></td>
+              <td>يفضل على worker وليس API.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تفعيل injury risk automation</td>
+              <td><code>INJURY_RISK_AUTOMATION_ENABLED=true</code></td>
+              <td>يشغل scan أسبوعي/دوري حسب env.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تفعيل notification cleanup</td>
+              <td><code>NOTIFICATION_CLEANUP_ENABLED=true</code></td>
+              <td>أرشفة وتنظيف notifications القديمة.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+    <section class="chapter cyan">
+      <h2>7. الجودة والاختبارات والأمان</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">Lint frontend</td>
+              <td><code>npm run lint</code></td>
+              <td>ESLint للواجهة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Build frontend</td>
+              <td><code>npm run build</code></td>
+              <td>يتأكد أن Next production build شغال.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Type check</td>
+              <td><code>npx tsc --noEmit</code></td>
+              <td>مفيد قبل deploy.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Backend lint</td>
+              <td><code>npm run backend:lint</code></td>
+              <td>يشغل lint داخل golx-backend.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Backend tests</td>
+              <td><code>npm run backend:test</code></td>
+              <td>يشغل Jest backend.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">E2E tests</td>
+              <td><code>npm run test:e2e</code></td>
+              <td>Playwright smoke/e2e.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Install browser for E2E</td>
+              <td><code>npm run test:e2e:install</code></td>
+              <td>يثبت Chromium لو ناقص.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Security audit</td>
+              <td><code>npm run security:audit</code></td>
+              <td>npm audit للواجهة والباك.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Quality checks</td>
+              <td><code>npm run quality</code></td>
+              <td>i18n + text + artifacts + dump scan.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Full verify</td>
+              <td><code>npm run verify</code></td>
+              <td>lint + quality + build + backend lint/test + security audit.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+    <section class="chapter gray">
+      <h2>8. Deploy وأدوات مساعدة</h2>
+      <table>
+        <thead>
+          <tr><th>الحالة / الهدف</th><th>الأمر</th><th>ملاحظات التشغيل</th></tr>
+        </thead>
+        <tbody>
+          
+            <tr>
+              <td class="goal">Auto deploy watch</td>
+              <td><code>npm run deploy:auto</code></td>
+              <td>يشغل scripts/auto-docker-deploy.ps1.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Deploy مرة واحدة</td>
+              <td><code>npm run deploy:auto:once</code></td>
+              <td>مناسب لتحديث سريع.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Linux deploy script</td>
+              <td><code>bash scripts/deploy-production.sh</code></td>
+              <td>لبيئة Linux/VPS إن كانت مهيأة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">تشغيل سكريبت CMD</td>
+              <td><code>scripts\start-auto-docker-deploy.cmd</code></td>
+              <td>مفيد من ويندوز.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Load test</td>
+              <td><code>cd golx-backend &amp;&amp; npm run load:test</code></td>
+              <td>اختبار حمل أساسي.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Mixed load test</td>
+              <td><code>cd golx-backend &amp;&amp; npm run load:mixed</code></td>
+              <td>سيناريوهات مختلطة.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Socket load test</td>
+              <td><code>cd golx-backend &amp;&amp; npm run load:socket</code></td>
+              <td>يركز على realtime/socket.</td>
+            </tr>
+          
+            <tr>
+              <td class="goal">Analyze load report</td>
+              <td><code>cd golx-backend &amp;&amp; npm run load:analyze</code></td>
+              <td>تحليل نتائج الحمل.</td>
+            </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  
+
+      <section class="incident-section page-break">
+        <h2>سيناريوهات الطوارئ: لو حصل كذا اعمل كذا</h2>
+        <table>
+          <thead><tr><th>المشكلة</th><th>التصرف الصحيح</th><th>أول أمر تبدأ به</th></tr></thead>
+          <tbody>
+            
+              <tr>
+                <td class="goal">الداتابيز فاضية لكن الجداول موجودة</td>
+                <td>شغل migrations لو محتاج، ثم bootstrap:admin، بعدها login وفعّل MFA.</td>
+                <td><code>npm run bootstrap:admin</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">التطبيق مش بيفتح بعد deploy</td>
+                <td>ابدأ بـ ps ثم logs ثم ready endpoint، وبعدها راجع env secrets.</td>
+                <td><code>docker compose -f docker-compose.prod.yml ps</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">Redis واقع</td>
+                <td>في dev شغل infra:up. في prod راجع logs redis وأعد تشغيل worker بعد رجوعه.</td>
+                <td><code>npm run infra:up</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">API شغال لكن jobs لا تعمل</td>
+                <td>راجع worker logs وBULLMQ_WORKERS_ENABLED وRedis.</td>
+                <td><code>docker compose -f docker-compose.prod.yml logs -f worker</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">عايز نسخة قبل migration خطير</td>
+                <td>اعمل backup يدوي ثم شغل migrate.</td>
+                <td><code>cd golx-backend &amp;&amp; npm run backup:db</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">الداتابيز اتمسحت والدخول مستحيل</td>
+                <td>استرجع من CLI/worker لأن زر Settings لن يفتح بدون DB.</td>
+                <td><code>CONFIRM_RESTORE="RESTORE GOALIX" npm run restore:db -- file.dump</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">الأدمن نسي MFA أو الجهاز ضاع</td>
+                <td>استخدم إدارة MFA من admin آخر. لو مفيش admin آخر، استخدم bootstrap recovery بحذر أو تدخل DB مباشر مؤقت.</td>
+                <td><code>BOOTSTRAP_ADMIN_ALLOW_EXISTING=true npm run bootstrap:admin</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">ملفات dump ظهرت في Git</td>
+                <td>شغل scan-dumps واحذف الملفات من التتبع. لا ترفع production dumps.</td>
+                <td><code>npm run security:scan-dumps</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">عايز تعرض الموقع على موبايل في نفس الشبكة</td>
+                <td>شغل dev ثم lan:info وربما lan:setup.</td>
+                <td><code>npm run lan:info</code></td>
+              </tr>
+            
+              <tr>
+                <td class="goal">تغيير أسرار JWT أو CSRF</td>
+                <td>اتبع runbook rotation. لا تغير TOTP_ENCRYPTION_KEY مباشرة بدون re-encryption.</td>
+                <td><code>راجع docs/production-hardening-runbook.md</code></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      </section>
+
+      <section class="env-section">
+        <h2>أهم متغيرات البيئة</h2>
+        <table>
+          <thead><tr><th>المتغير</th><th>مثال / قيمة</th><th>وظيفته</th></tr></thead>
+          <tbody>
+            
+              <tr><td class="goal">DATABASE_URL</td><td><code>postgresql://USER:PASSWORD@HOST:5432/golx_main</code></td><td>اتصال PostgreSQL.</td></tr>
+            
+              <tr><td class="goal">REDIS_URL</td><td><code>redis://redis:6379</code></td><td>اتصال Redis للـ cache/queues/realtime.</td></tr>
+            
+              <tr><td class="goal">JWT_SECRET / JWT_REFRESH_SECRET</td><td><code>32+ random chars</code></td><td>توقيع access/refresh tokens.</td></tr>
+            
+              <tr><td class="goal">CSRF_SECRET / COOKIE_SECRET</td><td><code>32+ random chars</code></td><td>حماية cookies وCSRF.</td></tr>
+            
+              <tr><td class="goal">TOTP_ENCRYPTION_KEY</td><td><code>64 hex chars or 32-byte base64</code></td><td>تشفير أسرار MFA. لا تغيره مباشرة.</td></tr>
+            
+              <tr><td class="goal">MFA_ENFORCED_ROLES</td><td><code>admin,coach</code></td><td>يجبر هذه الأدوار على MFA.</td></tr>
+            
+              <tr><td class="goal">BACKUP_DIR</td><td><code>/app/backups</code></td><td>مكان حفظ ملفات .dump و.sha256.</td></tr>
+            
+              <tr><td class="goal">BACKUP_AUTOMATION_ENABLED</td><td><code>true</code></td><td>تشغيل backup تلقائي من worker.</td></tr>
+            
+              <tr><td class="goal">BACKUP_INTERVAL_MINUTES</td><td><code>1440</code></td><td>الفاصل بين النسخ التلقائية.</td></tr>
+            
+              <tr><td class="goal">BACKUP_RETENTION_DAYS</td><td><code>14</code></td><td>حذف النسخ الأقدم.</td></tr>
+            
+              <tr><td class="goal">BACKUP_RESTORE_ENABLED</td><td><code>false</code></td><td>تمكين زر restore في Settings في production.</td></tr>
+            
+              <tr><td class="goal">BOOTSTRAP_ADMIN_PASSWORD</td><td><code>StrongPass#123</code></td><td>كلمة مرور أول أدمن أو recovery admin.</td></tr>
+            
+              <tr><td class="goal">BOOTSTRAP_ADMIN_ALLOW_EXISTING</td><td><code>false</code></td><td>اسمح بتحديث أدمن موجود عند recovery فقط.</td></tr>
+            
+          </tbody>
+        </table>
+      </section>
+
+      <section class="principles">
+        <h2>Checklist قبل Production Deploy</h2>
+        <div class="callout">
+          <b>نفذ بالترتيب:</b>
+          <br />1. تأكد من env secrets قوية وغير placeholder.
+          <br />2. شغل migrations.
+          <br />3. شغل bootstrap admin لو الداتا فاضية.
+          <br />4. تأكد أن worker يعمل وأن Redis healthy.
+          <br />5. أنشئ backup يدوي قبل أي تغيير كبير.
+          <br />6. شغل verify أو على الأقل lint/build/backend:test.
+          <br />7. اختبر login + MFA + dashboard + backup status.
+        </div>
+        <p class="footer-note">Generated from the current Goalix workspace scripts and operational runbooks.</p>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

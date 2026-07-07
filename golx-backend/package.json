@@ -1,0 +1,86 @@
+{
+    "name": "goalix-backend",
+    "version": "1.0.0",
+    "description": "GOALIX Sports Academy Platform — Backend API",
+    "main": "src/server.js",
+    "scripts": {
+        "start": "node src/server.js",
+        "dev": "nodemon src/server.js",
+        "worker": "node src/workers/run.js",
+        "migrate": "knex migrate:latest",
+        "migrate:rollback": "knex migrate:rollback",
+        "migrate:make": "knex migrate:make",
+        "seed": "knex seed:run",
+        "seed:admin": "knex seed:run --specific=03_bootstrap_admin.js",
+        "bootstrap:admin": "node scripts/bootstrap-admin.js",
+        "seed:make": "knex seed:make",
+        "fixtures:e2e": "node scripts/create-e2e-fixtures.js",
+        "test:e2e:roles": "node scripts/test-e2e-roles.js",
+        "test": "jest --runInBand",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage",
+        "load:test": "node load-tests/load-test.js",
+        "load:mixed": "node load-tests/mixed-load-test.js",
+        "load:socket": "node load-tests/mixed-load-test.js --profile=socket",
+        "load:soak": "node load-tests/mixed-load-test.js --profile=30min-soak",
+        "load:analyze": "node load-tests/analyze-report.js",
+        "load:cleanup": "node load-tests/cleanup.js",
+        "data:lifecycle:run": "node scripts/run-data-lifecycle.js",
+        "data:lifecycle:dry-run": "node scripts/run-data-lifecycle.js --dry-run",
+        "data:lifecycle:report": "node scripts/report-data-lifecycle.js",
+        "db:audit": "node scripts/audit-database-architecture.js",
+        "db:audit:strict": "node scripts/audit-database-architecture.js --strict",
+        "lint": "eslint src/",
+        "lint:fix": "eslint src/ --fix",
+        "backup:db": "node scripts/backup-postgres.js",
+        "restore:db": "node scripts/restore-postgres.js",
+        "dump:sanitize": "node scripts/sanitize-sql-dump.js"
+    },
+    "dependencies": {
+        "@aws-sdk/client-s3": "^3.1076.0",
+        "@socket.io/redis-adapter": "^8.3.0",
+        "bcrypt": "^6.0.0",
+        "bullmq": "^5.79.1",
+        "compression": "^1.7.5",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "exceljs": "^4.4.0",
+        "express": "^4.21.2",
+        "express-rate-limit": "^7.4.1",
+        "helmet": "^8.2.0",
+        "hpp": "^0.2.3",
+        "ioredis": "^5.11.1",
+        "jsonwebtoken": "^9.0.2",
+        "knex": "^3.2.10",
+        "multer": "^2.2.0",
+        "otplib": "^13.4.0",
+        "pg": "^8.22.0",
+        "pino": "^9.5.0",
+        "pino-pretty": "^11.3.0",
+        "qrcode": "^1.5.4",
+        "rate-limit-redis": "^4.3.1",
+        "socket.io": "^4.8.3",
+        "uuid": "^11.1.1",
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "eslint": "^9.13.0",
+        "jest": "^29.7.0",
+        "nodemon": "^3.1.7",
+        "socket.io-client": "^4.8.3",
+        "supertest": "^7.0.0"
+    },
+    "overrides": {
+        "qs": "6.15.2",
+        "ws": "8.21.0"
+    },
+    "jest": {
+        "setupFilesAfterEnv": [
+            "<rootDir>/tests/jest.setup.js"
+        ]
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    }
+}

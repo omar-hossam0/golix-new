@@ -1,0 +1,36 @@
+{
+  "profile": "10k-baseline",
+  "targets": ["https://staging-api.goalix.example"],
+  "users": 10000,
+  "stages": [1000, 2500, 5000, 10000],
+  "stageDurationSec": 120,
+  "shardCount": 1,
+  "shardIndex": 0,
+  "socketRatio": 0.1,
+  "socketPath": "/socket.io",
+  "socketTransports": ["websocket", "polling"],
+  "roleRatios": {
+    "player": 0.45,
+    "parent": 0.2,
+    "coach": 0.25,
+    "admin": 0.1
+  },
+  "workload": {
+    "dashboardReads": 45,
+    "chatReads": 15,
+    "socketChat": 10,
+    "rankingsReads": 10,
+    "notificationReads": 8,
+    "coachReads": 7,
+    "adminReads": 3,
+    "safeWrites": 2
+  },
+  "thresholds": {
+    "httpErrorRateMax": 0.005,
+    "readP95MsMax": 800,
+    "writeP95MsMax": 1500,
+    "p99MsMax": 3000,
+    "socketConnectSuccessRateMin": 0.99,
+    "socketDisconnectRateMax": 0.01
+  }
+}
