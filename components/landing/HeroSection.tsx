@@ -280,6 +280,11 @@ export default function HeroSection({
               <polyline points="12 5 19 12 12 19" />
             </svg>
           </button>
+          <button className="gx-hero-menu-button" type="button" aria-label="Open navigation menu">
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
       </nav>
 
@@ -426,15 +431,15 @@ export default function HeroSection({
           { value: "10M+", label: "Matches Analyzed", color: "#22d3ee", icon: "chart" },
           { value: "120+", label: "Countries", color: "#22d3ee", icon: "globe" },
         ].map((stat, index) => (
-          <div key={stat.label} style={{ display: "flex", alignItems: "center", flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 16, flex: 1, justifyContent: "center" }}>
+          <div className="gx-hero-stat-item" key={stat.label} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+            <div className="gx-hero-stat-content" style={{ display: "flex", alignItems: "center", gap: 16, flex: 1, justifyContent: "center" }}>
               <StatIcon type={stat.icon} color={stat.color} />
               <div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1.1, fontFamily: "'Inter',sans-serif" }}>{stat.value}</div>
-                <div style={{ fontSize: 12, color: "#94a3b8", marginTop: 2, fontWeight: 500, fontFamily: "'Inter',sans-serif" }}>{stat.label}</div>
+                <div className="gx-hero-stat-value" style={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1.1, fontFamily: "'Inter',sans-serif" }}>{stat.value}</div>
+                <div className="gx-hero-stat-label" style={{ fontSize: 12, color: "#94a3b8", marginTop: 2, fontWeight: 500, fontFamily: "'Inter',sans-serif" }}>{stat.label}</div>
               </div>
             </div>
-            {index < 3 && <div style={{ width: 1, height: 44, background: "rgba(255,255,255,0.08)" }} />}
+            {index < 3 && <div className="gx-hero-stat-separator" style={{ width: 1, height: 44, background: "rgba(255,255,255,0.08)" }} />}
           </div>
         ))}
       </div>

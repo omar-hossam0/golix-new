@@ -77,6 +77,7 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
   const [contacts, setContacts] = useState<ContactsResponse>({});
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [mobileThreadOpen, setMobileThreadOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [body, setBody] = useState("");
   const [image, setImage] = useState<File | null>(null);
@@ -243,6 +244,7 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
         setConversations([]);
         setMessages([]);
         setSelectedId(null);
+        setMobileThreadOpen(false);
         setConnectionWarning("");
         setRealtimeReady(false);
       });
@@ -468,6 +470,7 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
       });
       upsertConversation(conversation);
       setSelectedId(conversation.id);
+      setMobileThreadOpen(true);
       setGroupDetailsOpen(true);
       setEditingMessage(null);
       setBody("");
@@ -525,6 +528,7 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
         });
         upsertConversation(conversation);
         setSelectedId(conversation.id);
+        setMobileThreadOpen(true);
         setGroupDetailsOpen(false);
         setEditingMessage(null);
         setBody("");
@@ -539,6 +543,7 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
       });
       upsertConversation(conversation);
       setSelectedId(conversation.id);
+      setMobileThreadOpen(true);
       setGroupDetailsOpen(false);
       setEditingMessage(null);
       setBody("");
@@ -697,7 +702,13 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
   }
 
   return (
-    <div className="goalix-chat-shell" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div
+      className={cn(
+        "goalix-chat-shell",
+        selected && mobileThreadOpen && "is-thread-open",
+      )}
+      dir={language === "ar" ? "rtl" : "ltr"}
+    >
       <ChatConversationsPanel
         t={t}
         loading={loading}
@@ -706,6 +717,7 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
         query={query}
         onSelectConversation={(conversationId) => {
           setSelectedId(conversationId);
+          setMobileThreadOpen(true);
           setGroupDetailsOpen(false);
         }}
       />
@@ -716,6 +728,10 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
           selectedIsGroup={selectedIsGroup}
           groupDetailsOpen={groupDetailsOpen}
           t={t}
+          onMobileBack={() => {
+            setMobileThreadOpen(false);
+            setGroupDetailsOpen(false);
+          }}
           onToggleGroupDetails={() =>
             setGroupDetailsOpen((current) => !current)
           }
@@ -931,7 +947,9 @@ export function ChatWorkspace({ role }: { role: ChatRole }) {
               ) : (
                 <Send className="h-4 w-4" />
               )}
-              {editingMessage ? t.save : t.send}
+              <span className="goalix-chat-send-label">
+                {editingMessage ? t.save : t.send}
+              </span>
             </Button>
           </div>
         </form>

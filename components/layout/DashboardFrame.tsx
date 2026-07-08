@@ -397,26 +397,19 @@ export function DashboardFrame({
         type="checkbox"
         aria-hidden="true"
         tabIndex={-1}
+        checked={mobileNavOpen}
+        readOnly
       />
       <header className="goalix-mobile-header">
-        <label
-          htmlFor={mobileNavToggleId}
-          role="button"
-          tabIndex={0}
+        <button
+          type="button"
           className="goalix-mobile-menu-button"
           aria-label={t("Menu")}
           aria-expanded={mobileNavOpen}
           onClick={toggleMobileNav}
-          onKeyDown={(event) => {
-            if (event.key !== "Enter" && event.key !== " ") return;
-            event.preventDefault();
-            const toggle = document.getElementById(mobileNavToggleId) as HTMLInputElement | null;
-            if (toggle) toggle.checked = !toggle.checked;
-            toggleMobileNav();
-          }}
         >
           <Menu size={18} />
-        </label>
+        </button>
         <Link href={ROLE_ROUTES[role]} className="goalix-mobile-logo" aria-label={t("Goalix dashboard home")}>
           <span className="goalix-mobile-logo-mark">G</span>
           <strong>GOALIX</strong>
@@ -432,8 +425,8 @@ export function DashboardFrame({
         </div>
       </header>
 
-      <label
-        htmlFor={mobileNavToggleId}
+      <button
+        type="button"
         className="goalix-mobile-nav-backdrop"
         aria-label={t("Close menu")}
         onClick={() => setMobileNavOpen(false)}
