@@ -19,6 +19,7 @@ const eslintConfig = defineConfig([
     "golx-backend/**",
     "create-pdf.js",
     "find_charts.js",
+    "scripts/generate-*.js",
   ]),
 ]);
 

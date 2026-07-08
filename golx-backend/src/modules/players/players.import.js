@@ -456,7 +456,7 @@ const worksheetValue = (column, value, branchById) => {
   }
   if (column.type === "branch") {
     const branch = branchById.get(String(value));
-    return branch ? `${branch.name} [${branch.id}]` : value;
+    return branch ? branch.name : value;
   }
   return value;
 };
@@ -570,9 +570,7 @@ async function buildPlayerImportTemplate(
     );
   });
 
-  const branchLabels = branches.map(
-    (branch) => `${branch.name} [${branch.id}]`,
-  );
+  const branchLabels = branches.map((branch) => branch.name);
   referenceSheet.columns = [
     { header: "Branches", key: "branches", width: 42 },
     { header: "Gender", key: "gender", width: 18 },
@@ -669,7 +667,8 @@ async function buildPlayerImportTemplate(
         ? "The sample rows are tutorials. Delete them before adding your real players."
         : "Add player rows below the header. Do not change the column structure.",
     "New players must include every manual creation field and a valid password. Existing players may leave Password blank to keep it unchanged.",
-    "Use the dropdown values supplied by the template for branch, gender, preferred foot, guardian relation, and status.",
+    "Use the branch name exactly as it appears in the dropdown. Branch IDs are not required.",
+    "Use the dropdown values supplied by the template for gender, preferred foot, guardian relation, and status.",
     "Dates must be real dates displayed as YYYY-MM-DD.",
     "Username is the unique matching key. Player names are not used to detect duplicates.",
     "The whole file is validated first. If any row has an error, no player is created or updated.",

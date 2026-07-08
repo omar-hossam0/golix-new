@@ -768,21 +768,26 @@ class PlayersService {
       );
       const rowErrorCount = errors.length;
       const suppliedBranch = String(row.data.branchId || "").trim();
+      const branchesMatchingName =
+        branchesByName.get(suppliedBranch.toLowerCase()) || [];
       const branch =
         branchById.get(suppliedBranch) ||
         branchByLabel.get(suppliedBranch.toLowerCase()) ||
-        (branchesByName.get(suppliedBranch.toLowerCase())?.length === 1
-          ? branchesByName.get(suppliedBranch.toLowerCase())[0]
+        (branchesMatchingName.length === 1
+          ? branchesMatchingName[0]
           : null);
 
       if (!branch) {
+        const branchMessage =
+          branchesMatchingName.length > 1
+            ? "This branch name matches more than one accessible branch. Rename duplicate branches or choose a unique branch name."
+            : "Choose an accessible branch name from the template dropdown list.";
         addError({
           row: row.rowNumber,
           column: "Branch",
           field: "branchId",
           value: suppliedBranch,
-          message:
-            "Choose an accessible branch from the template dropdown list.",
+          message: branchMessage,
         });
       } else {
         row.data.branchId = branch.id;

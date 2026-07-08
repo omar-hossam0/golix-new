@@ -37,7 +37,7 @@ const rowData = (overrides = {}) => ({
   nationality: "Egyptian",
   phone: "01000000001",
   address: "Cairo",
-  branchId: `${branch.name} [${branch.id}]`,
+  branchId: branch.name,
   guardianName: "Guardian",
   guardianPhone: "01000000002",
   guardianRelation: "Father",
@@ -196,6 +196,54 @@ describe("PlayersService Excel imports", () => {
       heightCm: 150,
       weightKg: 44,
     });
+    expect(result.rows[2].data.branchId).toBe(branch.id);
+  });
+
+  test("keeps old branch label files compatible while templates use branch names", async () => {
+    const repo = {
+      db: {},
+      findBranchesForImport: jest.fn().mockResolvedValue([branch]),
+      findBranchByIdAndAcademy: jest.fn().mockResolvedValue(branch),
+      findExistingImportUsers: jest.fn().mockResolvedValue([]),
+      findImportPlayersByUsernames: jest.fn().mockResolvedValue([]),
+    };
+    const service = new PlayersService(repo);
+    const buffer = await workbookWithRows([
+      rowData({ branchId: `${branch.name} [${branch.id}]` }),
+    ]);
+
+    const result = await service.validatePlayerImport(buffer, actor);
+
+    expect(result.valid).toBe(true);
+    expect(result.rows[0].data.branchId).toBe(branch.id);
+  });
+
+  test("reports unknown branch names during import validation", async () => {
+    const repo = {
+      db: {},
+      findBranchesForImport: jest.fn().mockResolvedValue([branch]),
+      findBranchByIdAndAcademy: jest.fn().mockResolvedValue(branch),
+      findExistingImportUsers: jest.fn().mockResolvedValue([]),
+      findImportPlayersByUsernames: jest.fn().mockResolvedValue([]),
+    };
+    const service = new PlayersService(repo);
+    const buffer = await workbookWithRows([
+      rowData({ branchId: "Missing Branch" }),
+    ]);
+
+    const result = await service.validatePlayerImport(buffer, actor);
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          row: 2,
+          field: "branchId",
+          value: "Missing Branch",
+          message: "Choose an accessible branch name from the template dropdown list.",
+        }),
+      ]),
+    );
   });
 
   test("creates, updates, and skips inside one outer transaction", async () => {
