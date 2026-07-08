@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <title>Goalix Architecture Report</title>
+  <style>
+    @page { size: A4; margin: 13mm 11mm 16mm 11mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: #142033;
+      background: #f4f7f9;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      direction: rtl;
+      line-height: 1.85;
+      font-size: 13px;
+    }
+    .cover {
+      min-height: 100vh;
+      color: #fff;
+      padding: 56px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background:
+        linear-gradient(135deg, rgba(0,0,0,.08), rgba(255,255,255,.06)),
+        linear-gradient(135deg, #12324a 0%, #0f6b69 53%, #17324e 100%);
+      page-break-after: always;
+    }
+    .kicker { color: #bdf6ff; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+    .cover h1 { font-size: 42px; line-height: 1.18; margin: 18px 0 14px; max-width: 820px; }
+    .cover p { font-size: 18px; color: #e6fbff; max-width: 850px; margin: 0 0 28px; }
+    .pills { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pill { padding: 8px 13px; border: 1px solid rgba(255,255,255,.38); border-radius: 999px; background: rgba(255,255,255,.12); }
+    .page { background: #fff; padding: 18px 24px 34px; }
+    .section { margin-bottom: 26px; page-break-inside: avoid; }
+    .section.break { page-break-before: always; }
+    h2 {
+      font-size: 24px;
+      color: #0f3554;
+      margin: 20px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid #2ba6a0;
+    }
+    h3 { color: #105b63; font-size: 16px; margin: 6px 0 8px; }
+    p { margin: 8px 0 10px; }
+    code {
+      direction: ltr;
+      unicode-bidi: isolate;
+      background: #edf3f7;
+      color: #0d4a68;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+    }
+    .lead {
+      font-size: 16px;
+      background: #edfafa;
+      border-right: 5px solid #249b96;
+      padding: 14px 16px;
+      border-radius: 8px;
+      color: #244052;
+    }
+    .callout {
+      border: 1px solid #cfe0ea;
+      border-right: 5px solid #2b8fb8;
+      border-radius: 8px;
+      padding: 11px 13px;
+      margin: 12px 0;
+      background: #f4fbff;
+    }
+    .callout.warn { background: #fff8ed; border-color: #ffd6a1; border-right-color: #f59e0b; }
+    .callout.good { background: #eefaf3; border-color: #bfe8d1; border-right-color: #22a06b; }
+    .callout.risk { background: #fff1f1; border-color: #f1bcbc; border-right-color: #d64545; }
+    .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 12px 0; }
+    .card { border: 1px solid #d9e5ec; border-radius: 8px; background: linear-gradient(180deg, #fff, #f8fbfc); padding: 12px 13px; min-height: 96px; }
+    .table-wrap { border: 1px solid #d8e4ec; border-radius: 8px; overflow: hidden; margin: 12px 0 16px; }
+    table { width: 100%; border-collapse: collapse; font-size: 11.8px; }
+    th { background: #12324a; color: #fff; text-align: right; padding: 8px; }
+    td { border-top: 1px solid #e4edf2; padding: 7px 8px; vertical-align: top; }
+    tr:nth-child(even) td { background: #f7fbfc; }
+    .steps { counter-reset: item; list-style: none; padding: 0; margin: 12px 0; }
+    .steps li {
+      position: relative;
+      margin: 8px 0;
+      padding: 9px 42px 9px 12px;
+      background: #f8fbfc;
+      border: 1px solid #dae7ee;
+      border-radius: 8px;
+    }
+    .steps li::before {
+      counter-increment: item;
+      content: counter(item);
+      position: absolute;
+      right: 10px;
+      top: 9px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #1d7f86;
+      color: #fff;
+      text-align: center;
+      line-height: 22px;
+      font-weight: 800;
+    }
+    .flow { display: flex; align-items: stretch; gap: 7px; flex-wrap: wrap; margin: 12px 0; }
+    .flow-box {
+      border: 1px solid #cfe0ea;
+      background: #ffffff;
+      border-radius: 8px;
+      min-width: 110px;
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      color: #17324e;
+      font-weight: 700;
+    }
+    .arrow { align-self: center; color: #1b7778; font-size: 20px; font-weight: 900; }
+    .mini-flow { border: 1px solid #d9e6ee; border-radius: 8px; padding: 12px; margin: 12px 0; background: #fbfdfe; page-break-inside: avoid; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    ul { margin: 8px 22px 12px 0; padding: 0; }
+    li { margin: 4px 0; }
+    .small { color: #64748b; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="cover">
+      <div class="kicker">Goalix Architecture Deep Explanation</div>
+      <h1>شرح معماري تفصيلي كامل للمشروع</h1>
+      <p>نسخة موسعة: بدون Mermaid code داخل الـ PDF، وبشرح عملي لكل جزء: queue، jobs، Redis، caching، Nginx، الأداء، قاعدة البيانات، والـ flows خطوة بخطوة.</p>
+      <div class="pills">
+        <span class="pill">2026-07-08</span>
+        <span class="pill">Next.js 16 App Router</span>
+        <span class="pill">Express API</span>
+        <span class="pill">PostgreSQL + Redis</span>
+        <span class="pill">BullMQ Workers</span>
+      </div>
+    </section>
+
+    <div class="page">
+      <section class="section "><h2>الفكرة العامة</h2><p>Goalix مش عبارة عن صفحة Dashboard فقط. هو نظام تشغيل لأكاديمية رياضية: عندك مستخدمين بأدوار مختلفة، كل دور له شاشات وصلاحيات، وكل عملية في الواجهة تتحول لطلب API، والـ API يقرأ أو يكتب في PostgreSQL، وأحيانا يستخدم Redis لتسريع القراءة أو تأجيل شغل للـ worker.</p>
+        <div class="lead">أهم جملة تفهم منها النظام: PostgreSQL هو المكان الذي يحفظ الحقيقة النهائية، Redis هو طبقة مساعدة للسرعة والتوزيع والشغل الخلفي، والـ worker هو العامل الذي ينفذ المهام التي لا يجب أن تعطل المستخدم وهو ينتظر الرد.</div>
+        <div class="cards"><article class="card">
+        <h3>Frontend</h3>
+        <p>Next.js App Router. فيه مسارات admin/coach/player/parent/auth، وRTK Query لجلب البيانات وإعادة المحاولة عند refresh session أو CSRF.</p>
+      </article><article class="card">
+        <h3>Backend</h3>
+        <p>Express API. كل module له routes/controller/service/repository. هذا يجعل المنطق مقسم بدل ملف واحد ضخم.</p>
+      </article><article class="card">
+        <h3>Database</h3>
+        <p>PostgreSQL عبر Knex. أي بيانات مهمة مثل users, sessions, players, matches, attendance, chat, notifications محفوظة هناك.</p>
+      </article><article class="card">
+        <h3>Redis + Workers</h3>
+        <p>Redis يشغل queues والكاش والrate limits والSocket.IO adapter والlocks. Workers تستهلك queues وتشغل automations.</p>
+      </article></div>
+        <div class="mini-flow"><h3>الصورة الكبيرة للطلب</h3><div class="flow"><div class="flow-box">Browser</div><div class="arrow">←</div><div class="flow-box">Next.js / Nginx</div><div class="arrow">←</div><div class="flow-box">Express Middleware</div><div class="arrow">←</div><div class="flow-box">Controller</div><div class="arrow">←</div><div class="flow-box">Service</div><div class="arrow">←</div><div class="flow-box">Repository</div><div class="arrow">←</div><div class="flow-box">PostgreSQL / Redis / Queue</div></div></div>
+        </section>
+
+      <section class="section break"><h2>يعني إيه Job؟ وليه نخزنها؟</h2><p>كلمة job هنا معناها أمر شغل صغير. تخيل ورقة تعليمات مكتوب عليها: اعمل كذا، ومعاك البيانات دي. الـ API بدل ما ينفذ الشغل الطويل بنفسه وهو المستخدم مستني، يحط ورقة التعليمات دي في queue. بعد كده worker منفصل يقرأ الورقة وينفذها.</p>
+        <div class="callout good"><strong>مثال بسيط</strong><div>لما يحصل تعديل حساس في النظام، محتاجين نسجل audit log. بدل ما الطلب يفضل مستني خطوة تسجيل إضافية، الـ API يجهز job اسمها log وفيها بيانات العملية. worker يقرأها ويكتبها في audit_logs.</div></div>
+        <div class="table-wrap"><table><thead><tr><th>المفهوم</th><th>معناه في Goalix</th><th>الفائدة العملية</th></tr></thead><tbody><tr><td>Job name</td><td>اسم المهمة، مثل <code>log</code> أو <code>generate-invoice</code></td><td>يقول للworker أي handler يشغل</td></tr><tr><td>Payload / Data</td><td>البيانات اللازمة لتنفيذ المهمة، مثل user_id/action/ip أو subscriptionId</td><td>الworker لا يحتاج يرجع للrequest الأصلي؛ كل اللازم موجود</td></tr><tr><td>Queue</td><td>قائمة انتظار داخل Redis تديرها BullMQ</td><td>ترتيب المهام، retry، failure tracking، وفصل الحمل عن API</td></tr><tr><td>Worker</td><td>process منفصل يقرأ jobs وينفذها</td><td>الشغل الثقيل لا يوقف المستخدم ولا يضغط على API process</td></tr><tr><td>Attempts</td><td>محاولات إعادة التنفيذ عند الفشل، حاليا 3</td><td>لو حصل خطأ مؤقت، job لا تضيع مباشرة</td></tr><tr><td>Backoff</td><td>انتظار يزيد تدريجيا، exponential delay يبدأ 2 ثانية</td><td>يقلل الضغط عند فشل خدمة خارجية أو DB مؤقتا</td></tr><tr><td>removeOnComplete</td><td>الاحتفاظ بآخر 1000 job مكتملة</td><td>تاريخ قصير للمراقبة بدون تضخيم Redis</td></tr><tr><td>removeOnFail</td><td>الاحتفاظ بآخر 5000 job فاشلة</td><td>سهولة debug للفشل المتكرر</td></tr></tbody></table></div>
+        <p>إذن الجملة “queue بتخزن jobs” معناها: Redis يحتفظ بسجلات صغيرة لكل مهمة: اسمها، بياناتها، حالتها، عدد محاولاتها، وقت تنفيذها، وهل فشلت أو نجحت. هي لا تخزن اللاعبين ولا الأكاديميات كبديل للDB. هي تخزن أوامر تنفيذ مؤقتة أو خلفية.</p>
+        <div class="callout good"><strong>ليه التخزين مفيد؟</strong><div>لأنه يسمح للنظام يقول للمستخدم: تم قبول العملية بسرعة، ثم يكمل الشغل غير العاجل في الخلفية. كمان لو عندك ضغط كبير، jobs تصطف بدل ما تكسر السيرفر. ولو worker وقع ورجع، يقدر يكمل من Redis.</div></div>
+        </section>
+
+      <section class="section "><h2>Queue في المشروع بالضبط</h2><p>الملف <code>golx-backend/src/infrastructure/queue.js</code> ينشئ خمس queues: rankings, notifications, payments, ai, audit. كل queue اسمها الحقيقي يبدأ بـ prefix من env، افتراضيا <code>goalix</code>. يعني مثلا audit تصبح <code>goalix-audit</code>.</p>
+        <p>الـ API يستخدم queue.add(jobName, payload). BullMQ يحفظ job داخل Redis. worker process في production يبدأ من src/workers/run.js، يتصل بPostgreSQL وRedis، ثم يفتح workers لكل queue.</p>
+        <div class="table-wrap"><table><thead><tr><th>Queue</th><th>متى تتضاف؟</th><th>ما البيانات المخزنة؟</th><th>ماذا يفعل worker الآن؟</th><th>هل هي مكتملة؟</th></tr></thead><tbody><tr><td><code>goalix-audit</code></td><td>بعد POST/PUT/PATCH/DELETE على مسارات حساسة مثل admin, auth, players, coaches, payments, academy, chat</td><td>user_id, action, table_name/entity, record_id, ip_address, user_agent, session_jti, metadata فيها method/url/status/requestId</td><td>يقرأ job ويعمل insert في <code>audit_logs</code></td><td>نعم، وهذه أهم queue فعالة حاليا</td></tr><tr><td><code>goalix-rankings</code></td><td>عند طلب recalculation للweekly/monthly rankings</td><td>groupId وperiodType</td><td>حاليا يرجع skipped بسبب <code>ranking_worker_not_connected_to_model</code></td><td>البنية موجودة، التنفيذ الفعلي غير موصل في worker</td></tr><tr><td><code>goalix-notifications</code></td><td>عند إرسال notification بقناة غير in_app</td><td>notificationIds/channel/academyId/targetRole</td><td>يرجع skipped لأن delivery provider غير configured</td><td>in-app مكتملة في DB، delivery الخارجي غير مكتمل</td></tr><tr><td><code>goalix-payments</code></td><td>بعد createSubscription</td><td>subscriptionId لتوليد invoice</td><td>فيه TODO لتوليد PDF invoice وتخزينه وإخطار المستخدم</td><td>غير مكتمل كتكامل دفع/فاتورة</td></tr><tr><td><code>goalix-ai</code></td><td>عند calculate performance أو assess injury risk أو nutrition plan أو AI chat</td><td>playerId أو userId/prompt/context</td><td>يرجع provider_not_configured</td><td>API layer موجودة، worker provider غير موصل</td></tr></tbody></table></div>
+        <div class="mini-flow"><h3>Audit queue خطوة بخطوة</h3><div class="flow"><div class="flow-box">Mutation request</div><div class="arrow">←</div><div class="flow-box">Response finished</div><div class="arrow">←</div><div class="flow-box">Build audit payload</div><div class="arrow">←</div><div class="flow-box">auditQueue.add('log')</div><div class="arrow">←</div><div class="flow-box">Redis stores job</div><div class="arrow">←</div><div class="flow-box">Audit worker reads</div><div class="arrow">←</div><div class="flow-box">Insert audit_logs</div><div class="arrow">←</div><div class="flow-box">Job completed</div></div></div>
+        <div class="callout good"><strong>مهم جدا</strong><div>لو Redis غير متاح أثناء audit، الكود لا يضيع الـ audit log: يحاول fallback ويكتب مباشرة في PostgreSQL. لذلك audit queue هنا optimization وفصل حمل، وليست نقطة فشل وحيدة.</div></div>
+        <p>أما queues الأخرى فوجودها حاليا يعني أن تصميم النظام جاهز للشغل الخلفي، لكن ليس كل worker مربوط بتنفيذ حقيقي. هذا فرق مهم: architecture جاهزة، لكن بعض integrations لم تكتمل.</p>
+        </section>
+
+      <section class="section break"><h2>Redis: هو بيعمل إيه غير الكاش؟</h2><p>Redis في Goalix هو shared runtime. يعني حاجة سريعة في الذاكرة تستخدمها كل processes. استخداماته كثيرة: queues، session cache، rate limit counters، socket fanout، distributed locks، وكاشات JSON قصيرة.</p>
+        <div class="table-wrap"><table><thead><tr><th>الاستخدام</th><th>ما الذي يتخزن؟</th><th>لماذا؟</th><th>لو Redis وقع؟</th></tr></thead><tbody><tr><td>BullMQ queues</td><td>Jobs وحالتها ومحاولاتها</td><td>تشغيل background tasks وفصلها عن API</td><td>workers لا تعمل بشكل طبيعي، API يدخل degraded حسب المكان</td></tr><tr><td>Auth session cache</td><td>session key لكل access token + user sessions set + touch lock</td><td>تقليل ضربات DB عند كل request وتخفيف تحديث last_seen</td><td>يرجع لفحص DB session</td></tr><tr><td>Auth user cache</td><td>snapshot للمستخدم بعد sanitize</td><td>تسريع /me والبيانات المتكررة</td><td>يرجع للDB</td></tr><tr><td>Permissions cache</td><td>نتيجة حساب صلاحيات الدور</td><td>الصلاحيات تقرأ كثيرا وتتغير قليلا</td><td>يرجع للDB</td></tr><tr><td>MFA challenge</td><td>challengeId -> userId مؤقت</td><td>التحقق الثاني في login لا يحتاج state طويل</td><td>يوجد fallback PostgreSQL</td></tr><tr><td>Rate limiting</td><td>عدادات لكل IP أو user</td><td>منع abuse بشكل موزع بين instances</td><td>fallback MemoryStore محلي، أقل دقة مع تعدد instances</td></tr><tr><td>Attendance cache</td><td>overview JSON لمدة 30 ثانية مع version</td><td>شاشة attendance ممكن تكون ثقيلة</td><td>cache miss ثم DB</td></tr><tr><td>Academy branches cache</td><td>صفحات branches حسب academy/version/page/limit</td><td>تقليل قراءة branches المتكررة</td><td>cache miss ثم DB</td></tr><tr><td>Notification unread count</td><td>عدد غير المقروء لكل user</td><td>العداد يظهر في كل dashboard تقريبا</td><td>cache miss ثم DB</td></tr><tr><td>Chat conversations cache</td><td>قائمة المحادثات لكل user</td><td>الشات يقرأ نفس القائمة كثيرا</td><td>cache miss ثم DB</td></tr><tr><td>Socket.IO adapter</td><td>pub/sub بين API instances</td><td>لو user متصل على instance والحدث خرج من instance آخر، Redis يوصله</td><td>realtime يصبح محلي فقط</td></tr><tr><td>Automation locks</td><td>مفاتيح lock مؤقتة SET NX PX</td><td>منع تكرار نفس automation على أكثر من worker</td><td>في production قد يتم skip لحماية التكرار</td></tr></tbody></table></div>
+        <p>الكود عامل Redis كـ optional optimization في مناطق كثيرة: getJsonCache يرجع undefined عند الخطأ، وsetJsonCache يفشل بصمت، لأن DB هي المصدر الحقيقي. لكن في production compose Redis مطلوب صحيا قبل تشغيل api/worker.</p>
+        <div class="mini-flow"><h3>قراءة فيها Redis cache</h3><div class="flow"><div class="flow-box">Service receives request</div><div class="arrow">←</div><div class="flow-box">Build cache key</div><div class="arrow">←</div><div class="flow-box">Try Redis get</div><div class="arrow">←</div><div class="flow-box">Hit: return cached JSON</div><div class="arrow">←</div><div class="flow-box">Miss: query PostgreSQL</div><div class="arrow">←</div><div class="flow-box">Set Redis TTL</div><div class="arrow">←</div><div class="flow-box">Return result</div></div></div>
+        <div class="mini-flow"><h3>كتابة تلغي كاش</h3><div class="flow"><div class="flow-box">Mutation</div><div class="arrow">←</div><div class="flow-box">Write PostgreSQL</div><div class="arrow">←</div><div class="flow-box">Bump version or delete keys</div><div class="arrow">←</div><div class="flow-box">Next read builds new key</div><div class="arrow">←</div><div class="flow-box">Fresh DB result cached</div></div></div>
+        </section>
+
+      <section class="section "><h2>Caching: إيه اللي بيتكاش وليه؟</h2><p>مش كل حاجة في النظام متكاشة. الكاش مستخدم في الحاجات التي تقرأ كثيرا، نتيجتها آمنة للتخزين القصير، وتقدر ترجع من DB لو الكاش فشل.</p>
+        <div class="table-wrap"><table><thead><tr><th>Cache</th><th>Key shape تقريبا</th><th>TTL</th><th>سبب اختياره</th></tr></thead><tbody><tr><td>Attendance overview</td><td><code>goalix:cache:attendance:overview:{academy}:v{version}:{filters}</code></td><td>30 ثانية</td><td>overview قد يجمع attendance حسب branch/group/date، فالكاش يقلل الضغط</td></tr><tr><td>Academy branches</td><td><code>goalix:academy:{academy}:branches:v{version}:p{page}:l{limit}</code></td><td>120 ثانية افتراضيا</td><td>branches تظهر كثيرا ولا تتغير كل ثانية</td></tr><tr><td>Notification unread count</td><td><code>goalix:notifications:{user}:unread-count:v1</code></td><td>30 ثانية افتراضيا</td><td>badge في الشريط يحتاج قراءة متكررة</td></tr><tr><td>Chat conversations</td><td><code>goalix:chat:{user}:conversations:v1</code></td><td>15 ثانية افتراضيا</td><td>قائمة الشات تتكرر مع polling/realtime refresh</td></tr><tr><td>Auth user</td><td><code>goalix:auth:user:v1:{userId}</code></td><td>120 ثانية افتراضيا</td><td>تسريع بيانات المستخدم المتكررة</td></tr><tr><td>Auth permissions</td><td>مفتاح مبني من user/role/scope</td><td>30 ثانية افتراضيا</td><td>تقليل حساب الصلاحيات المتكرر</td></tr></tbody></table></div>
+        <div class="callout good"><strong>ليه TTL قصير؟</strong><div>لأن النظام إداري وبياناته حساسة. كاش طويل ممكن يعرض بيانات قديمة. لذلك معظم الكاشات قصيرة أو مربوطة بـ version key يتم زيادته عند mutation.</div></div>
+        </section>
+
+      <section class="section "><h2>Load Balancer / Nginx</h2><p>الموجود في <code>ops/nginx/nginx.prod.conf</code> حاليا هو Nginx reverse proxy. هو يستقبل المستخدمين على 80/443، يحول HTTP إلى HTTPS، ويرسل المسارات للservice المناسبة.</p>
+        <div class="table-wrap"><table><thead><tr><th>المسار</th><th>يروح فين؟</th><th>ملاحظات</th></tr></thead><tbody><tr><td><code>/health</code></td><td>API health</td><td>مسموح على HTTP وHTTPS</td></tr><tr><td><code>/api/v1/</code></td><td>Express API</td><td>proxy_read_timeout وsend_timeout 120s</td></tr><tr><td><code>/socket.io/</code></td><td>Express API Socket.IO</td><td>يدعم Upgrade/Connection للWebSocket</td></tr><tr><td><code>/uploads/</code></td><td>Express API</td><td>لأن الملفات protected وليست static</td></tr><tr><td><code>/</code></td><td>Next.js frontend</td><td>أي شيء غير API/socket/uploads</td></tr></tbody></table></div>
+        <div class="callout warn"><strong>هل هو Load Balancer؟</strong><div>حاليا لا بالمعنى الأفقي. upstream goalix_api يحتوي server واحد فقط: api:3000. لو أضفت api-1 وapi-2 وapi-3، وقتها Nginx يوزع بينهم افتراضيا round-robin.</div></div>
+        <p>Nginx لا يشغل workers ولا يوزع jobs. توزيع الـ jobs يتم لأن كل worker متصل بنفس Redis queue، وBullMQ يعطي كل job لworker واحد يستهلكها.</p>
+        <div class="mini-flow"><h3>توجيه Nginx الحالي</h3><div class="flow"><div class="flow-box">User HTTPS</div><div class="arrow">←</div><div class="flow-box">Nginx</div><div class="arrow">←</div><div class="flow-box">Route match</div><div class="arrow">←</div><div class="flow-box">API or Frontend upstream</div><div class="arrow">←</div><div class="flow-box">Service response</div><div class="arrow">←</div><div class="flow-box">User</div></div></div>
+        <p>في config الحالي يوجد keepalive 32 داخل upstreams، وmax_fails=3/fail_timeout=10s. هذه إعدادات تساعد connection reuse وتجنب server فاشل مؤقتا إذا كان عندك أكثر من upstream server لاحقا.</p>
+        </section>
+
+      <section class="section break"><h2>Performance: اتحسن إزاي؟</h2><p>الأداء في Goalix ليس feature واحدة. هو مجموعة قرارات تقلل وقت الانتظار وتقلل ضغط DB وتمنع السيرفر من الانهيار تحت الحمل.</p>
+        <div class="cards"><article class="card">
+        <h3>فصل worker عن API</h3>
+        <p>في production، api لا يشغل BullMQ workers. هذا يجعل الطلبات السريعة لا تتزاحم مع مهام AI/payment/notifications/ranking.</p>
+      </article><article class="card">
+        <h3>Connection reuse</h3>
+        <p>Next.js proxy يستخدم http/https agents بـ keepAlive وmaxSockets. Nginx يستخدم upstream keepalive. هذا يقلل تكلفة TCP connections.</p>
+      </article><article class="card">
+        <h3>Redis short caches</h3>
+        <p>قراءات ساخنة مثل unread count وattendance overview وchat conversations لا تضرب DB كل مرة.</p>
+      </article><article class="card">
+        <h3>Rate limits</h3>
+        <p>RedisStore للrate limits يجعل الحدود موزعة بين instances، مع fallback memory عند التعطل.</p>
+      </article><article class="card">
+        <h3>PostgreSQL pool/timeouts</h3>
+        <p>DB_POOL_MAX=10 في production compose، وstatement/lock/idle timeouts تقلل queries العالقة.</p>
+      </article><article class="card">
+        <h3>Slow logs</h3>
+        <p>SLOW_QUERY_LOG_MS وSLOW_REQUEST_LOG_MS يسمحان بمعرفة المسارات الثقيلة بدل التخمين.</p>
+      </article></div>
+        <div class="table-wrap"><table><thead><tr><th>التحسين</th><th>أين موجود؟</th><th>أثره</th></tr></thead><tbody><tr><td>Indexes للمسارات الساخنة</td><td>migrations 072, 080, 086, 094</td><td>يسرع notifications/chat/calendar/rankings/media lookups</td></tr><tr><td>إزالة indexes متكررة</td><td>migration 094</td><td>يقلل تكلفة الكتابة والتخزين</td></tr><tr><td>Autovacuum/fillfactor للجداول كثيرة التحديث</td><td>migration 094</td><td>يقلل bloat ويحسن updates على auth_refresh_tokens/notification_inbox/realtime_outbox/chat_conversations</td></tr><tr><td>Protected upload cache header</td><td>app.js /uploads</td><td>private max-age للملفات المسموح بها</td></tr><tr><td>Frontend RTK Query</td><td>lib/store/api/*</td><td>client-side caching, retries, invalidation tags</td></tr><tr><td>Polling محدود</td><td>notifications hooks</td><td>polling كل 120 ثانية مع skip when unfocused</td></tr></tbody></table></div>
+        <div class="callout warn"><strong>نقطة مهمة</strong><div>لا يصح نقول النظام يضمن 20k users من الكود فقط. الأداء الحقيقي يثبت بload test على staging يشبه production: Nginx، عدة API instances، workers، PostgreSQL منفصل، Redis منفصل، وبيانات قريبة من الواقع.</div></div>
+        </section>
+
+      <section class="section "><h2>Database: ماشية إزاي؟ وهل كويسة؟</h2><p>قاعدة البيانات PostgreSQL هي source of truth. الكود يستخدم Knex، ومعظم modules لا تكتب SQL عشوائي داخل controller؛ بل تمر عبر repositories. هذا جيد للفصل والاختبار وتقليل تكرار المنطق.</p>
+        <div class="table-wrap"><table><thead><tr><th>Domain</th><th>أمثلة جداول/كيانات</th><th>وظيفته</th></tr></thead><tbody><tr><td>Identity/Auth/IAM</td><td>auth_users, refresh/session tables, roles, permissions, MFA, audit_logs</td><td>الدخول، الجلسات، الصلاحيات، التتبع الأمني</td></tr><tr><td>Academy</td><td>academy_academies, branches, birth_years, groups</td><td>هيكل الأكاديمية والفروع والمجموعات والفئات العمرية</td></tr><tr><td>People</td><td>player_profiles, coach_profiles, parent_profiles, parent_player_links</td><td>اللاعبين والمدربين وأولياء الأمور والربط بينهم</td></tr><tr><td>Operations</td><td>calendar_events, training sessions, matches, attendance</td><td>التدريب، المباريات، الحضور، التقويم</td></tr><tr><td>Performance</td><td>ranking snapshots/inputs, evaluations, injury risk, AI tables</td><td>التقييمات والترتيب والتحليلات</td></tr><tr><td>Communication</td><td>chat_conversations, chat_messages, read_receipts, notification_inbox/logs</td><td>الشات والإشعارات وحالات القراءة</td></tr><tr><td>Billing/Storage/Ops</td><td>payments/subscriptions/media_files/lifecycle/backups</td><td>الاشتراكات والمدفوعات والملفات والأرشفة</td></tr></tbody></table></div>
+        <div class="callout good"><strong>الحكم</strong><div>نعم، التصميم الحالي جيد كنواة OLTP ومنظم للتوسع التدريجي. لكنه يحتاج PgBouncer وpg_stat_statements وbackup drills وload tests قبل production كبير.</div></div>
+        <p>لماذا لا نعمل sharding الآن؟ لأن التعقيد عالي جدا وغير مبرر بدون قياسات. الأفضل حاليا: indexes مبنية على queries حقيقية، connection budget مضبوط، lifecycle للأرشفة، وPgBouncer عند تعدد instances.</p>
+        <div class="mini-flow"><h3>Database write flow</h3><div class="flow"><div class="flow-box">Controller validates request</div><div class="arrow">←</div><div class="flow-box">Service checks ownership/policy</div><div class="arrow">←</div><div class="flow-box">Repository transaction/write</div><div class="arrow">←</div><div class="flow-box">PostgreSQL persists</div><div class="arrow">←</div><div class="flow-box">Cache invalidated</div><div class="arrow">←</div><div class="flow-box">Event/audit emitted</div></div></div>
+        </section>
+
+      <section class="section "><h2>Backend Modules بالتفصيل</h2><div class="table-wrap"><table><thead><tr><th>Module</th><th>المسؤولية</th><th>يعتمد على</th></tr></thead><tbody><tr><td>Auth</td><td>login, admin login, MFA, refresh, logout, session/me, password reset</td><td>PostgreSQL, Redis session/user caches, JWT, cookies, CSRF</td></tr><tr><td>Academy</td><td>academy settings, branches, birth years, groups</td><td>PostgreSQL, Redis branches cache, event bus</td></tr><tr><td>Players</td><td>player profiles, import/export, parent links, profile completion</td><td>PostgreSQL, upload validation/storage في بعض المسارات</td></tr><tr><td>Coaches</td><td>coach profiles, assignments, permissions, coach portal scope</td><td>PostgreSQL, AcademyService, RBAC</td></tr><tr><td>Calendar</td><td>training, matches, schedules, match day, evaluations, injury-risk inputs</td><td>PostgreSQL, CustomDataService, PlayersService, Redis attendance invalidation</td></tr><tr><td>Attendance</td><td>attendance overview and histories</td><td>PostgreSQL, Redis 30s overview cache</td></tr><tr><td>Rankings</td><td>weekly/monthly rankings, player history, recalculation request</td><td>PostgreSQL, rankingsQueue</td></tr><tr><td>Notifications</td><td>in-app notifications, unread count, delivery logs, cleanup</td><td>PostgreSQL, Redis unread cache, notificationsQueue, lifecycle service</td></tr><tr><td>Chat</td><td>conversations, messages, attachments, read receipts</td><td>PostgreSQL, Redis conversations cache, Socket.IO realtime</td></tr><tr><td>AI</td><td>performance score, injury risk, nutrition plan, AI chat requests</td><td>PostgreSQL, access policy, aiQueue</td></tr><tr><td>Payments</td><td>plans, subscriptions, payment records, invoices placeholder</td><td>PostgreSQL, paymentsQueue</td></tr><tr><td>Data lifecycle/Backups</td><td>archive old data, scheduled backup</td><td>PostgreSQL, Redis automation locks</td></tr></tbody></table></div></section>
+
+      <section class="section break"><h2>Authentication Flow</h2><p>الدخول في النظام ليس مجرد JWT. فيه cookies، refresh token/session record في DB، optional Redis session cache، CSRF، وMFA للأدوار الإدارية.</p>
+        <div class="mini-flow"><h3>Player/Parent login</h3><div class="flow"><div class="flow-box">Username/password</div><div class="arrow">←</div><div class="flow-box">AuthService verifies</div><div class="arrow">←</div><div class="flow-box">Create session in DB</div><div class="arrow">←</div><div class="flow-box">Cache session/user in Redis</div><div class="arrow">←</div><div class="flow-box">Set HttpOnly cookies</div><div class="arrow">←</div><div class="flow-box">Redirect dashboard</div></div></div>
+        <div class="mini-flow"><h3>Admin/Coach login with MFA</h3><div class="flow"><div class="flow-box">Password verified</div><div class="arrow">←</div><div class="flow-box">MFA required?</div><div class="arrow">←</div><div class="flow-box">Create challenge</div><div class="arrow">←</div><div class="flow-box">OTP/backup code</div><div class="arrow">←</div><div class="flow-box">Create session</div><div class="arrow">←</div><div class="flow-box">Set cookies</div></div></div>
+        <ol class="steps"><li>المستخدم يرسل username/password من الواجهة.</li><li>AuthService يجلب المستخدم ويتأكد من الدور والحالة وكلمة السر.</li><li>لو الدور admin أو coach وMFA مطلوب، يرجع mfa_required بدل ما ينشئ session مباشرة.</li><li>الـ challenge قد يحفظ في Redis كمفتاح مؤقت، ومعه fallback في PostgreSQL.</li><li>بعد OTP صحيح، يتم إنشاء refresh/session record في DB.</li><li>Access token وrefresh token يرسلان في cookies آمنة، وRedis يخزن session cache لتسريع الطلبات القادمة.</li><li>proxy.ts في Next يفحص accessToken وrole قبل السماح بدخول /admin أو /coach أو /player أو /parent.</li></ol>
+        </section>
+
+      <section class="section "><h2>Realtime Flow</h2><p>Realtime في Goalix يستخدم Socket.IO. الفكرة: حفظ البيانات في DB أولا، ثم إرسال event للمتصلين. هذا مهم لأن لو event ضاع، العميل يقدر يعمل REST refresh ويرجع للحقيقة من DB.</p>
+        <ol class="steps"><li>المتصفح يفتح socket connection مع cookies أو Bearer token.</li><li>Socket server يستخدم authenticateAccessToken للتحقق من المستخدم.</li><li>كل user يدخل room باسم user:{userId}.</li><li>عند فتح conversation، العميل يرسل chat:join.</li><li>الخادم يتأكد من أن المستخدم يملك حق دخول المحادثة.</li><li>عند message/notification، البيانات تحفظ في PostgreSQL أولا.</li><li>بعد الحفظ، Socket.IO يرسل chat:* أو notification:* للrooms المناسبة.</li><li>لو Redis adapter متاح، الحدث ينتقل بين API instances. لو غير متاح، الحدث محلي للinstance فقط.</li></ol>
+        <div class="mini-flow"><h3>Chat message</h3><div class="flow"><div class="flow-box">Send message</div><div class="arrow">←</div><div class="flow-box">Authorize conversation</div><div class="arrow">←</div><div class="flow-box">DB transaction</div><div class="arrow">←</div><div class="flow-box">Invalidate caches</div><div class="arrow">←</div><div class="flow-box">Emit socket event</div><div class="arrow">←</div><div class="flow-box">Clients refresh/update UI</div></div></div>
+        </section>
+
+      <section class="section "><h2>Protected Files / Uploads</h2><p>الملفات في المشروع لا ينفع تتساب static public ببساطة، لأن فيها chat attachments أو ملفات تخص لاعب/أكاديمية. لذلك /uploads/* في Express يتحقق من الصلاحية قبل إرسال الملف.</p>
+        <ol class="steps"><li>المستخدم يطلب /uploads/path.</li><li>authMiddleware يتأكد من access token.</li><li>لو path يبدأ بـ chat/، ChatService يتأكد أن المستخدم participant أو مسموح له بالattachment.</li><li>لو ملف عادي، storage metadata تبحث في media_files، ثم access policy تحدد هل المستخدم يرى الملف.</li><li>لو مسموح، storage adapter يرجع stream/file.</li><li>لو مرفوض، النظام يرجع 404 آمن حتى لا يكشف وجود الملف، وقد يسجل audit denied لو حساس.</li></ol>
+        </section>
+
+      <section class="section "><h2>Background Automations</h2><p>الـ automations هي شغل يتكرر بالوقت وليس بسبب request مباشر. مثال: reminders، weekly injury risk، notification cleanup، data lifecycle، backups.</p>
+        <div class="mini-flow"><h3>Automation lock flow</h3><div class="flow"><div class="flow-box">Timer fires</div><div class="arrow">←</div><div class="flow-box">Try Redis SET NX PX</div><div class="arrow">←</div><div class="flow-box">If acquired run task</div><div class="arrow">←</div><div class="flow-box">If not acquired skip</div><div class="arrow">←</div><div class="flow-box">Release by Lua compare/delete</div></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Automation</th><th>وظيفتها</th><th>لماذا lock؟</th></tr></thead><tbody><tr><td>Reminder scans</td><td>match day, attendance QR, monthly measurement reminders</td><td>حتى لا يرسل أكثر من worker نفس reminder</td></tr><tr><td>Weekly injury risk</td><td>تشغيل تحليل أسبوعي للإصابات</td><td>حتى لا يتكرر الحساب</td></tr><tr><td>Notification cleanup</td><td>أرشفة/حذف notification records القديمة حسب retention</td><td>حتى لا تعمل cleanup مرتين</td></tr><tr><td>Data lifecycle</td><td>أرشفة بيانات hot إلى archive tables</td><td>حماية من تكرار batches</td></tr><tr><td>Database backup</td><td>تشغيل backup دوري إذا مستحق</td><td>منع أكثر من backup متزامن</td></tr></tbody></table></div>
+        </section>
+
+      <section class="section break"><h2>Production Scaling: ماذا نحتاج لاحقا؟</h2><p>التصميم يسمح بالتوسع، لكن current compose يشغل API service واحد. للتوسع الحقيقي تضيف أكثر من API instance، أكثر من worker، وتضع PgBouncer أمام PostgreSQL.</p>
+        <div class="mini-flow"><h3>Target scale</h3><div class="flow"><div class="flow-box">Nginx/LB</div><div class="arrow">←</div><div class="flow-box">API instances</div><div class="arrow">←</div><div class="flow-box">PgBouncer</div><div class="arrow">←</div><div class="flow-box">PostgreSQL Primary</div><div class="arrow">←</div><div class="flow-box">Redis</div><div class="arrow">←</div><div class="flow-box">Worker pool</div><div class="arrow">←</div><div class="flow-box">S3 storage</div></div></div>
+        <div class="table-wrap"><table><thead><tr><th>المكون</th><th>الوضع الحالي</th><th>عند التوسع</th></tr></thead><tbody><tr><td>Nginx</td><td>upstream واحد للAPI وواحد للfrontend</td><td>أضف servers متعددة أو استخدم LB managed</td></tr><tr><td>API</td><td>service واحد في compose</td><td>عدة replicas stateless</td></tr><tr><td>Workers</td><td>worker service واحد</td><td>عدة workers تستهلك نفس BullMQ queues</td></tr><tr><td>PostgreSQL</td><td>postgres container مباشر</td><td>Managed Postgres أو Primary/Standby + PgBouncer</td></tr><tr><td>Redis</td><td>Redis واحد مع AOF</td><td>Managed Redis/HA، وربما فصل queue Redis عن cache/socket Redis عند الضغط العالي</td></tr><tr><td>Storage</td><td>local volume مسموح في compose</td><td>S3-compatible object storage للإنتاج الحقيقي</td></tr></tbody></table></div>
+        </section>
+
+      <section class="section "><h2>حدود وملاحظات صريحة</h2><ul><li>الـ PDF الحالي لا يحتوي Mermaid code. الأكواد موجودة فقط في ملف Markdown الملحق.</li><li>Audit queue فعالة فعلا. أما AI/ranking/payment/external notifications workers فهي في أغلبها stubs/TODO حاليا.</li><li>Nginx الحالي reverse proxy وليس load balancer أفقي لأن upstream فيه server واحد.</li><li>Redis مهم جدا للتشغيل الكامل، لكنه ليس مصدر الحقيقة للبيانات الأساسية.</li><li>قاعدة البيانات منظمة ومناسبة كبداية قوية، لكن إثبات تحمل أرقام كبيرة يحتاج load testing ومراقبة حقيقية.</li><li>يوجد تكرار في nginx config لنفس location / ثلاث مرات. السلوك غالبا ثابت، لكن الأفضل تنظيفه.</li></ul></section>
+
+      <section class="section "><h2>الملفات التي بني عليها التقرير</h2><ul><li><code>app/api/v1/[...path]/route.ts</code></li><li><code>proxy.ts</code></li><li><code>golx-backend/src/app.js</code></li><li><code>golx-backend/src/server.js</code></li><li><code>golx-backend/src/infrastructure/queue.js</code></li><li><code>golx-backend/src/infrastructure/redis.js</code></li><li><code>golx-backend/src/workers/*.js</code></li><li><code>golx-backend/src/bootstrap/service-factory.js</code></li><li><code>golx-backend/src/bootstrap/route-registry.js</code></li><li><code>golx-backend/src/bootstrap/background-automations.js</code></li><li><code>golx-backend/src/middleware/rateLimit.middleware.js</code></li><li><code>golx-backend/src/shared/auth-session-cache.js</code></li><li><code>golx-backend/src/shared/redis-json-cache.js</code></li><li><code>golx-backend/src/shared/attendance-cache.js</code></li><li><code>ops/nginx/nginx.prod.conf</code></li><li><code>docker-compose.prod.yml</code></li></ul>
+        <p class="small">Mermaid source محفوظ في Markdown، وليس داخل PDF.</p></section>
+    </div>
+  </main>
+</body>
+</html>
