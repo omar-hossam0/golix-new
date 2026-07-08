@@ -103,6 +103,13 @@ const coachProfileCopy = {
       "Generate replacement backup codes for this coach. Old coach codes will stop working.",
     generateCodes: "Generate Codes",
     backupCodes: "Backup codes",
+    resetCoachPassword: "Reset Coach Password",
+    resetPasswordDescription:
+      "Change the coach login password. The username stays locked and will not change.",
+    username: "Username",
+    noUsername: "No username",
+    newPassword: "New password",
+    confirmPassword: "Confirm password",
   },
   ar: {
     coachPhone: "هاتف المدرب",
@@ -151,6 +158,13 @@ const coachProfileCopy = {
       "أنشئ أكوادًا احتياطية بديلة لهذا المدرب. ستتوقف الأكواد القديمة عن العمل.",
     generateCodes: "إنشاء الأكواد",
     backupCodes: "الأكواد الاحتياطية",
+    resetCoachPassword: "إعادة تعيين كلمة مرور المدرب",
+    resetPasswordDescription:
+      "غيّر كلمة مرور دخول المدرب. اسم المستخدم ثابت ولن يتغير.",
+    username: "اسم المستخدم",
+    noUsername: "لا يوجد اسم مستخدم",
+    newPassword: "كلمة المرور الجديدة",
+    confirmPassword: "تأكيد كلمة المرور",
   },
 } as const;
 
@@ -436,22 +450,20 @@ export default function CoachProfilePage({
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>إعادة تعيين كلمة مرور المدرب</DialogTitle>
-            <DialogDescription>
-              غيّر كلمة مرور دخول المدرب. اسم المستخدم سيظل ثابتًا ولن يتغير.
-            </DialogDescription>
+            <DialogTitle>{t.resetCoachPassword}</DialogTitle>
+            <DialogDescription>{t.resetPasswordDescription}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleResetCoachPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="coach-reset-username">اسم المستخدم</Label>
+              <Label htmlFor="coach-reset-username">{t.username}</Label>
               <Input
                 id="coach-reset-username"
-                value={coach.username ?? "لا يوجد اسم مستخدم"}
+                value={coach.username ?? t.noUsername}
                 readOnly
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="coach-reset-password">كلمة المرور الجديدة</Label>
+              <Label htmlFor="coach-reset-password">{t.newPassword}</Label>
               <Input
                 id="coach-reset-password"
                 type="password"
@@ -462,7 +474,7 @@ export default function CoachProfilePage({
             </div>
             <div className="space-y-2">
               <Label htmlFor="coach-reset-password-confirm">
-                تأكيد كلمة المرور
+                {t.confirmPassword}
               </Label>
               <Input
                 id="coach-reset-password-confirm"
