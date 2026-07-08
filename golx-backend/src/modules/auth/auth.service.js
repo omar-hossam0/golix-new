@@ -65,6 +65,33 @@ class AuthService {
         this.redis = redis;
     }
 
+    async _createMfaChallenge(challengeId, userId, expiresAt) {
+        if (typeof this.repo.createMfaChallenge === 'function') {
+            await this.repo.createMfaChallenge(challengeId, userId, expiresAt);
+            return;
+        }
+
+        await this.repo.db('auth_mfa_challenges').insert({
+            id: challengeId,
+            user_id: userId,
+            expires_at: expiresAt,
+        });
+    }
+
+    async _consumeStoredMfaChallenge(challengeId, userId) {
+        if (typeof this.repo.consumeMfaChallenge === 'function') {
+            return await this.repo.consumeMfaChallenge(challengeId, userId);
+        }
+
+        const [row] = await this.repo.db('auth_mfa_challenges')
+            .where({ id: challengeId })
+            .whereNull('consumed_at')
+            .where('expires_at', '>', new Date())
+            .update({ consumed_at: new Date() })
+            .returning('user_id');
+        return row?.user_id || null;
+    }
+
     async _storeMfaChallenge(challengeId, userId) {
         try {
             const stored = await this.redis.set(
@@ -80,7 +107,7 @@ class AuthService {
         }
 
         try {
-            await this.repo.createMfaChallenge(
+            await this._createMfaChallenge(
                 challengeId,
                 userId,
                 new Date(Date.now() + MFA_CHALLENGE_TTL_SECONDS * 1000),
@@ -104,7 +131,7 @@ class AuthService {
         }
 
         try {
-            return await this.repo.consumeMfaChallenge(challengeId, userId);
+            return await this._consumeStoredMfaChallenge(challengeId, userId);
         } catch {
             throw new AppError(
                 'MFA verification is temporarily unavailable. Please try again.',
