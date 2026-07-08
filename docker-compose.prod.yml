@@ -201,6 +201,7 @@ services:
       ENABLE_HTTPS: ${ENABLE_HTTPS:-false}
       ENABLE_HSTS: ${ENABLE_HSTS:-false}
       FORCE_HTTPS: ${FORCE_HTTPS:-false}
+      UPGRADE_INSECURE_REQUESTS: ${UPGRADE_INSECURE_REQUESTS:-false}
       NEXT_PUBLIC_API_URL: ""
       NEXT_PUBLIC_SOCKET_URL: ""
     expose:

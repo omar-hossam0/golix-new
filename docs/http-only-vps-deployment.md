@@ -14,6 +14,7 @@ BACKEND_NODE_ENV=production
 ENABLE_HTTPS=false
 ENABLE_HSTS=false
 FORCE_HTTPS=false
+UPGRADE_INSECURE_REQUESTS=false
 CORS_ORIGINS=http://72.62.35.177
 GOALIX_INTERNAL_API_URL=http://api:3000
 NEXT_PUBLIC_API_URL=
@@ -62,8 +63,10 @@ Expected:
 - assets return `200`
 
 For temporary IP-based HTTPS, set `ENABLE_HTTPS=true` and keep
-`ENABLE_HSTS=false` and `FORCE_HTTPS=false`. This keeps secure cookies enabled
-on HTTPS without teaching browsers to force the IP to HTTPS permanently.
+`ENABLE_HSTS=false`, `FORCE_HTTPS=false`, and
+`UPGRADE_INSECURE_REQUESTS=false`. This keeps secure cookies enabled on HTTPS
+without teaching browsers to force the IP to HTTPS permanently or upgrading HTTP
+assets to the temporary self-signed certificate.
 
 ## Enable HTTPS later
 

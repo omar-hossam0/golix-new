@@ -33,8 +33,9 @@ function envFlag(name: string, defaultValue = false) {
 
 function securityHeaders(nonce: string, requestHost?: string) {
   const isDev = process.env.NODE_ENV === "development";
-  const enableHttps = envFlag("ENABLE_HTTPS") || envFlag("FORCE_HTTPS");
   const enableHsts = envFlag("ENABLE_HSTS");
+  const upgradeInsecureRequests =
+    envFlag("UPGRADE_INSECURE_REQUESTS") || envFlag("FORCE_HTTPS");
   const publicApiOrigin = getPublicApiOrigin();
   const apiWsOrigin = publicApiOrigin
     ? publicApiOrigin.replace(/^http:/, "ws:").replace(/^https:/, "wss:")
@@ -85,7 +86,7 @@ function securityHeaders(nonce: string, requestHost?: string) {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    ...(enableHttps ? ["upgrade-insecure-requests"] : []),
+    ...(upgradeInsecureRequests ? ["upgrade-insecure-requests"] : []),
   ].join("; ");
 
   const headers: Record<string, string> = {
