@@ -74,7 +74,7 @@ class AuthService {
                 MFA_CHALLENGE_TTL_SECONDS,
                 'NX',
             );
-            if (stored === 'OK') return;
+            if (stored === 'OK') return true;
         } catch {
             // PostgreSQL remains available as the durable fallback.
         }
@@ -85,6 +85,7 @@ class AuthService {
                 userId,
                 new Date(Date.now() + MFA_CHALLENGE_TTL_SECONDS * 1000),
             );
+            return true;
         } catch {
             throw new AppError(
                 'MFA verification is temporarily unavailable. Please try again.',

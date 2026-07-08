@@ -23,7 +23,7 @@ const validRow = {
   nationality: "Egyptian",
   phone: "01000000001",
   address: "Cairo",
-  branchId: `${branch.name} [${branch.id}]`,
+  branchId: branch.name,
   guardianName: "Test Guardian",
   guardianPhone: "01000000002",
   guardianRelation: "Father",
@@ -54,7 +54,7 @@ describe("player Excel imports", () => {
       gender: "male",
       guardianRelation: "father",
       isActive: true,
-      branchId: `${branch.name} [${branch.id}]`,
+      branchId: branch.name,
     });
   });
 
@@ -88,6 +88,7 @@ describe("player Excel imports", () => {
     const parsed = await parsePlayerImportWorkbook(buffer);
     expect(parsed.errors).toEqual([]);
     expect(parsed.rows[0].data.password).toBeNull();
+    expect(parsed.rows[0].data.branchId).toBe(branch.name);
   });
 
   test("reports missing template columns before reading player rows", async () => {
