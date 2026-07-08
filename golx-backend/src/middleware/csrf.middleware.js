@@ -40,7 +40,7 @@ function setCsrfCookie(req, res, next) {
     if (token !== existing) {
         res.cookie(COOKIE_NAME, token, {
             httpOnly: false,
-            secure: env.NODE_ENV === 'production',
+            secure: env.ENABLE_HTTPS === true,
             sameSite: 'lax',
             path: '/',
             maxAge: 24 * 60 * 60 * 1000,

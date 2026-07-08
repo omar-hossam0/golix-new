@@ -71,7 +71,9 @@ app.use((req, res, next) => {
 });
 
 app.use(helmet({
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    hsts: env.ENABLE_HTTPS === true
+        ? { maxAge: 31536000, includeSubDomains: true, preload: true }
+        : false,
     contentSecurityPolicy: false,
 }));
 app.use(cors({

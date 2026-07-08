@@ -25,8 +25,16 @@ function getPublicApiOrigin() {
   }
 }
 
+function envFlag(name: string, defaultValue = false) {
+  const value = process.env[name];
+  if (value === undefined) return defaultValue;
+  return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
+}
+
 function securityHeaders(nonce: string, requestHost?: string) {
   const isDev = process.env.NODE_ENV === "development";
+  const enableHttps = envFlag("ENABLE_HTTPS") || envFlag("FORCE_HTTPS");
+  const enableHsts = envFlag("ENABLE_HSTS") || enableHttps;
   const publicApiOrigin = getPublicApiOrigin();
   const apiWsOrigin = publicApiOrigin
     ? publicApiOrigin.replace(/^http:/, "ws:").replace(/^https:/, "wss:")
@@ -72,11 +80,12 @@ function securityHeaders(nonce: string, requestHost?: string) {
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' blob: data: ${[...new Set(httpConnectSources)].join(" ")}`,
     "font-src 'self' data:",
-    `connect-src 'self' ${[...new Set([...httpConnectSources, ...wsConnectSources])].join(" ")}`,
+    `connect-src 'self' ws: wss: ${[...new Set([...httpConnectSources, ...wsConnectSources])].join(" ")}`,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
+    ...(enableHttps ? ["upgrade-insecure-requests"] : []),
   ].join("; ");
 
   const headers: Record<string, string> = {
@@ -89,15 +98,25 @@ function securityHeaders(nonce: string, requestHost?: string) {
     "X-Permitted-Cross-Domain-Policies": "none",
   };
 
-  if (!isDev) {
+  if (!isDev && enableHsts) {
     headers["Strict-Transport-Security"] =
       "max-age=31536000; includeSubDomains; preload";
-    headers["Content-Security-Policy"] = `${csp}; upgrade-insecure-requests`;
+  }
+
+  if (!isDev) {
     headers["Permissions-Policy"] =
       "camera=(self), microphone=(), geolocation=()";
   }
 
   return headers;
+}
+
+function isRequestHttps(request: NextRequest) {
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  if (forwardedProto) {
+    return forwardedProto.split(",")[0]?.trim().toLowerCase() === "https";
+  }
+  return request.nextUrl.protocol === "https:";
 }
 
 function getAccessJwtSecret() {
@@ -182,6 +201,12 @@ export async function proxy(request: NextRequest) {
   const requestHost =
     request.headers.get("host")?.split(":")[0] || request.nextUrl.hostname;
   const headers = securityHeaders(nonce, requestHost);
+
+  if (envFlag("FORCE_HTTPS") && !isRequestHttps(request)) {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.protocol = "https:";
+    return NextResponse.redirect(redirectUrl, 308);
+  }
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);

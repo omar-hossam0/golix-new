@@ -316,7 +316,7 @@ class AuthController {
     _cookieOptions(maxAge, path = '/') {
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: env.ENABLE_HTTPS === true,
             sameSite: 'strict',
             maxAge,
             path,
