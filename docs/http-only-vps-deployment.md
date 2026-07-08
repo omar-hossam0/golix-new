@@ -28,6 +28,20 @@ docker compose -f docker-compose.prod.yml up -d --build
 docker compose -f docker-compose.prod.yml ps
 ```
 
+For the automated GitHub Actions CD path, set these repository secrets:
+
+```text
+VPS_HOST=72.62.35.177
+VPS_USER=root
+VPS_PORT=22
+VPS_APP_DIR=/opt/goalix/golix-new
+VPS_SSH_KEY=<private deploy key>
+```
+
+The CD job runs after the Docker Hub image is pushed. It pulls
+`omarhossam2005/golix:main` for the frontend, builds the backend locally on the
+VPS, recreates the production stack, and verifies health checks.
+
 ## Verify
 
 ```bash
