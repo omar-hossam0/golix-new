@@ -61,6 +61,7 @@ export function useDashboardPreferences() {
     document.documentElement.dataset.goalixDashboardMotion = motion;
     document.documentElement.dataset.goalixDashboardFocus = focusMode;
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+    document.documentElement.classList.toggle("dark", theme === "dark");
 
     const viewport = document.querySelector(".goalix-dashboard-viewport");
     viewport?.setAttribute("data-dashboard-language", language);

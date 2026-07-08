@@ -11,6 +11,7 @@ import {
   Lock,
   ShieldCheck,
   UserRound,
+  UsersRound,
 } from "lucide-react";
 import { GoalixAuthShell } from "@/components/auth/GoalixAuthShell";
 import { useAuth } from "@/lib/auth/auth-context";
@@ -52,7 +53,9 @@ export default function LoginPage() {
     <GoalixAuthShell>
       <div className="goalix-login-card">
         <div className="goalix-login-card-head">
-          <h1>Welcome Back</h1>
+          <h1>
+            Welcome <span>Back</span>
+          </h1>
           <p>Log in to your GOALIX account</p>
         </div>
 
@@ -67,7 +70,8 @@ export default function LoginPage() {
               }}
               aria-pressed={role === "player"}
             >
-              Player
+              <UserRound size={16} aria-hidden="true" />
+              <span>Player</span>
             </button>
             <button
               type="button"
@@ -78,7 +82,8 @@ export default function LoginPage() {
               }}
               aria-pressed={role === "parent"}
             >
-              Parent
+              <UsersRound size={16} aria-hidden="true" />
+              <span>Parent</span>
             </button>
           </div>
 
@@ -163,8 +168,10 @@ export default function LoginPage() {
           {/* Secure Badge */}
           <p className="goalix-login-secure">
             <ShieldCheck size={14} />
-            Your data is <strong>secure</strong> with enterprise-grade
-            encryption.
+            <span>
+              Your data is <strong>secure</strong> with enterprise-grade
+              encryption.
+            </span>
           </p>
         </form>
       </div>

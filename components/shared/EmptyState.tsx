@@ -19,7 +19,7 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-xl border border-dashed border-border/50 px-6 py-16 text-center",
+        "goalix-empty-state flex flex-col items-center justify-center rounded-xl border border-dashed border-border/50 px-6 py-16 text-center",
         className
       )}
     >

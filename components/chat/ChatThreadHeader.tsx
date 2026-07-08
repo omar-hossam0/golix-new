@@ -1,4 +1,4 @@
-import { Users } from "lucide-react";
+import { ArrowLeft, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -11,6 +11,7 @@ type ChatThreadHeaderProps = {
   selectedIsGroup: boolean;
   groupDetailsOpen: boolean;
   t: ChatCopy;
+  onMobileBack?: () => void;
   onToggleGroupDetails: () => void;
   closeSession: () => void;
 };
@@ -20,6 +21,7 @@ export function ChatThreadHeader({
   selectedIsGroup,
   groupDetailsOpen,
   t,
+  onMobileBack,
   onToggleGroupDetails,
   closeSession,
 }: ChatThreadHeaderProps) {
@@ -27,6 +29,16 @@ export function ChatThreadHeader({
     <div className="goalix-chat-thread-head">
       {selected ? (
         <>
+          {onMobileBack && (
+            <button
+              type="button"
+              className="goalix-chat-mobile-back"
+              onClick={onMobileBack}
+              aria-label={t.back || "Back"}
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+          )}
           <button
             type="button"
             className={cn(
