@@ -102,8 +102,10 @@ const envSchema = z.object({
     TOTP_ENCRYPTION_KEY: z.string().optional(),
 
     // Admin Login Rate Limit
-    ADMIN_AUTH_RATE_LIMIT_MAX: z.coerce.number().default(5),
-    ADMIN_AUTH_RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().default(15),
+    ADMIN_AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(5).default(30),
+    ADMIN_AUTH_RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().min(1).default(15),
+    MFA_AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(5).default(30),
+    MFA_AUTH_RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().min(1).default(15),
     AUTH_ACCOUNT_RATE_LIMIT_MAX: z.coerce.number().int().min(3).default(10),
     AUTH_ACCOUNT_RATE_LIMIT_WINDOW_MINUTES: z.coerce.number().int().min(1).default(15),
 

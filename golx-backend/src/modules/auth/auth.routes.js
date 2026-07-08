@@ -2,7 +2,7 @@ const { Router } = require('express');
 const validate = require('../../middleware/validate.middleware');
 const { authMiddleware, optionalAuth } = require('../../middleware/auth.middleware');
 const { rbacAny } = require('../../middleware/rbac.middleware');
-const { authLimiter, adminAuthLimiter } = require('../../middleware/rateLimit.middleware');
+const { authLimiter, adminAuthLimiter, mfaAuthLimiter } = require('../../middleware/rateLimit.middleware');
 const {
     registerSchema,
     signupSchema,
@@ -145,14 +145,14 @@ function authRoutes(controller) {
 
     router.post(
         '/2fa/verify',
-        adminAuthLimiter,
+        mfaAuthLimiter,
         validate({ body: verify2FASchema }),
         controller.verify2FA,
     );
 
     router.post(
         '/2fa/backup-verify',
-        adminAuthLimiter,
+        mfaAuthLimiter,
         validate({ body: backupCodeSchema }),
         controller.verifyBackupCode,
     );

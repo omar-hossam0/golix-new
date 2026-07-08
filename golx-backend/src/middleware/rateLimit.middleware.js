@@ -140,11 +140,12 @@ const authLimiter = rateLimit({
 });
 
 /**
- * Stricter admin auth rate limiter: fewer attempts allowed
+ * Admin credential submissions are protected by account lockout as well, so
+ * keep this IP throttle high enough for normal admin + coach sign-in flows.
  */
 const adminAuthLimiter = rateLimit({
-    windowMs: (env.ADMIN_AUTH_RATE_LIMIT_WINDOW_MINUTES || 15) * 60 * 1000,
-    max: env.ADMIN_AUTH_RATE_LIMIT_MAX || 5,
+    windowMs: env.ADMIN_AUTH_RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
+    max: env.ADMIN_AUTH_RATE_LIMIT_MAX,
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator,
@@ -152,6 +153,20 @@ const adminAuthLimiter = rateLimit({
     handler: (_req, res) => {
         res.status(429).json(
             ApiResponse.error('RATE_LIMIT_EXCEEDED', 'Too many admin authentication attempts, please try again later'),
+        );
+    },
+});
+
+const mfaAuthLimiter = rateLimit({
+    windowMs: env.MFA_AUTH_RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
+    max: env.MFA_AUTH_RATE_LIMIT_MAX,
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator,
+    store: getStore('mfa_auth'),
+    handler: (_req, res) => {
+        res.status(429).json(
+            ApiResponse.error('RATE_LIMIT_EXCEEDED', 'Too many MFA verification attempts, please try again later'),
         );
     },
 });
@@ -188,6 +203,7 @@ module.exports = {
     apiLimiter,
     authLimiter,
     adminAuthLimiter,
+    mfaAuthLimiter,
     chatWriteLimiter,
     uploadLimiter,
 };

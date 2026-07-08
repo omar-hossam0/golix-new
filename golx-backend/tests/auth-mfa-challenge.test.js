@@ -48,13 +48,33 @@ describe('MFA login challenges', () => {
         };
         const service = new AuthService(repo, redis);
 
-        await service._storeMfaChallenge('challenge-1', 'user-1');
+        await expect(service._storeMfaChallenge('challenge-1', 'user-1')).resolves.toBe(true);
 
         expect(repo.createMfaChallenge).toHaveBeenCalledWith(
             'challenge-1',
             'user-1',
             expect.any(Date),
         );
+    });
+
+    test('returns true when Redis stores a challenge', async () => {
+        const repo = {
+            createMfaChallenge: jest.fn(),
+        };
+        const redis = {
+            set: jest.fn(async () => 'OK'),
+        };
+        const service = new AuthService(repo, redis);
+
+        await expect(service._storeMfaChallenge('challenge-1', 'user-1')).resolves.toBe(true);
+        expect(redis.set).toHaveBeenCalledWith(
+            'goalix:auth:mfa-challenge:challenge-1',
+            'user-1',
+            'EX',
+            300,
+            'NX',
+        );
+        expect(repo.createMfaChallenge).not.toHaveBeenCalled();
     });
 
     test('consumes a PostgreSQL challenge when Redis is unavailable', async () => {
