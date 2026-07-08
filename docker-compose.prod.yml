@@ -1,7 +1,10 @@
 x-backend-env: &backend-env
   NODE_ENV: ${BACKEND_NODE_ENV:-production}
-  ENABLE_HTTPS: ${ENABLE_HTTPS:-false}
-  ENABLE_HSTS: ${ENABLE_HSTS:-false}
+  # The current VPS is IP-only and uses HTTP as the trusted public entrypoint.
+  # Keep these hard-disabled so stale server .env values cannot mark auth cookies
+  # as Secure before a real domain certificate is installed.
+  ENABLE_HTTPS: "false"
+  ENABLE_HSTS: "false"
   HOST: 0.0.0.0
   PORT: 3000
   DATABASE_URL: postgresql://golx:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/golx_main
@@ -202,10 +205,10 @@ services:
       HOSTNAME: 0.0.0.0
       GOALIX_INTERNAL_API_URL: http://api:3000
       GOALIX_ACCESS_JWT_SECRET: ${GOALIX_ACCESS_JWT_SECRET:?GOALIX_ACCESS_JWT_SECRET must match backend JWT_SECRET}
-      ENABLE_HTTPS: ${ENABLE_HTTPS:-false}
-      ENABLE_HSTS: ${ENABLE_HSTS:-false}
-      FORCE_HTTPS: ${FORCE_HTTPS:-false}
-      UPGRADE_INSECURE_REQUESTS: ${UPGRADE_INSECURE_REQUESTS:-false}
+      ENABLE_HTTPS: "false"
+      ENABLE_HSTS: "false"
+      FORCE_HTTPS: "false"
+      UPGRADE_INSECURE_REQUESTS: "false"
       NEXT_PUBLIC_API_URL: ""
       NEXT_PUBLIC_SOCKET_URL: ""
     expose:
