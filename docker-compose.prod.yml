@@ -1,6 +1,7 @@
 x-backend-env: &backend-env
   NODE_ENV: ${BACKEND_NODE_ENV:-production}
   ENABLE_HTTPS: ${ENABLE_HTTPS:-false}
+  ENABLE_HSTS: ${ENABLE_HSTS:-false}
   HOST: 0.0.0.0
   PORT: 3000
   DATABASE_URL: postgresql://golx:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/golx_main

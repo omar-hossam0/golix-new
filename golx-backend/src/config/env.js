@@ -25,6 +25,7 @@ const envSchema = z.object({
     PORT: z.coerce.number().default(3000),
     HOST: z.string().default('0.0.0.0'),
     ENABLE_HTTPS: optionalBoolean,
+    ENABLE_HSTS: optionalBoolean,
 
     // Database
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),

@@ -1,7 +1,9 @@
 # GOALIX HTTP-only VPS deployment
 
-Use this mode only while GOALIX is served by a VPS IP address without a trusted
-domain certificate.
+Use this mode while GOALIX is served by a VPS IP address without a trusted
+domain certificate. HTTPS can be exposed with a temporary self-signed
+certificate, but browsers will not trust it until a real domain and certificate
+are configured.
 
 ## Required `.env` values
 
@@ -58,6 +60,10 @@ Expected:
 - no `Strict-Transport-Security` header
 - no `upgrade-insecure-requests` CSP directive
 - assets return `200`
+
+For temporary IP-based HTTPS, set `ENABLE_HTTPS=true` and keep
+`ENABLE_HSTS=false` and `FORCE_HTTPS=false`. This keeps secure cookies enabled
+on HTTPS without teaching browsers to force the IP to HTTPS permanently.
 
 ## Enable HTTPS later
 

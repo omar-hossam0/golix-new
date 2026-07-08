@@ -71,7 +71,7 @@ app.use((req, res, next) => {
 });
 
 app.use(helmet({
-    hsts: env.ENABLE_HTTPS === true
+    hsts: env.ENABLE_HSTS === true
         ? { maxAge: 31536000, includeSubDomains: true, preload: true }
         : false,
     contentSecurityPolicy: false,
