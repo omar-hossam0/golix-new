@@ -405,7 +405,24 @@ export default function HeroSection({
               WebkitMaskImage: "radial-gradient(ellipse 90% 90% at 50% 50%, black 70%, transparent 100%)",
             }}
           >
-            <Image src="/Player.png" alt="Player" fill style={{ objectFit: "contain", objectPosition: "center", mixBlendMode: "lighten" }} priority />
+            <Image
+              className="gx-hero-player-image gx-hero-player-image--desktop"
+              src="/Player.png"
+              alt="Player"
+              fill
+              sizes="(max-width: 1024px) 0px, 900px"
+              style={{ objectFit: "contain", objectPosition: "center", mixBlendMode: "lighten" }}
+              priority
+            />
+            <Image
+              className="gx-hero-player-image gx-hero-player-image--mobile"
+              src="/player-mob.png"
+              alt="Player"
+              fill
+              sizes="(max-width: 720px) 620px, (max-width: 1024px) 760px, 0px"
+              style={{ objectFit: "contain", objectPosition: "center", mixBlendMode: "lighten" }}
+              priority
+            />
           </div>
         </div>
       </div>

@@ -1685,6 +1685,20 @@
   display: none;
 }
 
+.gx-hero-player-image--mobile {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .gx-hero-player-image--desktop {
+    display: none !important;
+  }
+
+  .gx-hero-player-image--mobile {
+    display: block !important;
+  }
+}
+
 @media (max-width: 720px) {
   .gx-hero {
     position: relative !important;
@@ -1989,6 +2003,150 @@
   .gx-hero-stats {
     min-height: 116px !important;
     margin-inline: 19px !important;
+  }
+}
+
+/* Phone hero art direction: keep desktop untouched, match the compact mobile reference. */
+@media (max-width: 720px) {
+  .gx-hero {
+    width: 100% !important;
+    min-height: 620px !important;
+    max-height: none !important;
+    height: auto !important;
+    padding-bottom: 13px !important;
+    background:
+      radial-gradient(circle at 88% 36%, rgba(0, 216, 255, 0.16), transparent 12rem),
+      radial-gradient(circle at 63% 74%, rgba(182, 255, 0, 0.12), transparent 12rem),
+      #000510 !important;
+  }
+
+  .gx-hero-nav {
+    height: 70px !important;
+    min-height: 70px !important;
+    padding: 25px 20px 8px !important;
+  }
+
+  .gx-hero-nav-left img {
+    width: 59px !important;
+  }
+
+  .gx-hero-stage {
+    height: 379px !important;
+    min-height: 379px !important;
+    max-height: 379px !important;
+    padding: 8px 20px 0 !important;
+  }
+
+  .gx-hero-stage::before {
+    inset: 0 auto 20px 0 !important;
+    width: 67% !important;
+    background: linear-gradient(90deg, #000510 0%, rgba(0, 5, 16, 0.94) 44%, rgba(0, 5, 16, 0) 100%) !important;
+  }
+
+  .gx-hero-copy {
+    flex-basis: 60% !important;
+    max-width: 194px !important;
+  }
+
+  .gx-hero-title {
+    width: 196px !important;
+    margin-bottom: 10px !important;
+    font-size: clamp(37px, 12vw, 40px) !important;
+    line-height: 0.88 !important;
+  }
+
+  .gx-hero-subtitle {
+    max-width: 184px !important;
+    margin-bottom: 14px !important;
+    font-size: 10px !important;
+    line-height: 1.52 !important;
+  }
+
+  .gx-hero-player {
+    top: 66px !important;
+    right: -205px !important;
+    width: 520px !important;
+    height: 348px !important;
+    opacity: 1 !important;
+  }
+
+  .gx-hero-player > div {
+    transform: scale(1.04) !important;
+    mask-image: radial-gradient(ellipse 94% 92% at 52% 50%, black 72%, transparent 100%) !important;
+    -webkit-mask-image: radial-gradient(ellipse 94% 92% at 52% 50%, black 72%, transparent 100%) !important;
+  }
+
+  .gx-hero-player img {
+    object-position: center top !important;
+  }
+
+  .gx-hero-stats {
+    margin: 0 20px !important;
+    min-height: 120px !important;
+    height: 120px !important;
+    grid-template-rows: repeat(2, 60px) !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1024px) {
+  .gx-hero-links {
+    display: none !important;
+  }
+
+  .gx-hero-actions {
+    margin-left: auto !important;
+    align-items: center !important;
+  }
+
+  .gx-hero-menu-button {
+    display: inline-flex !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    color: #fff !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .gx-hero-menu-button span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .gx-hero-player {
+    top: 20px !important;
+    right: -180px !important;
+    width: 760px !important;
+    height: 620px !important;
+  }
+
+  .gx-hero-player > div {
+    transform: scale(1.12) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .gx-hero-stage {
+    height: 379px !important;
+    min-height: 379px !important;
+    max-height: 379px !important;
+  }
+
+  .gx-hero-player {
+    top: 70px !important;
+    right: -205px !important;
+    width: 520px !important;
+    height: 342px !important;
   }
 }
 
