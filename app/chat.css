@@ -3415,6 +3415,43 @@ body:has(#goalix-ecosystem:target) .gx-section-nav-link[href="#goalix-ecosystem"
   }
 }
 
+/* Final chat responsive pass: no fake empty scroll and no side gutters on phone/tablet. */
+@media (max-width: 900px) {
+  .goalix-chat-shell {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .goalix-chat-shell {
+    height: calc(100dvh - 78px) !important;
+    min-height: 0 !important;
+  }
+
+  .goalix-chat-shell.is-thread-open .goalix-chat-thread {
+    border-radius: 0 !important;
+  }
+
+  .goalix-chat-messages:has(.goalix-chat-center + .goalix-chat-message-stack:empty) {
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+  }
+
+  .goalix-chat-messages:has(.goalix-chat-center + .goalix-chat-message-stack:empty)::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .goalix-chat-messages:has(.goalix-chat-center + .goalix-chat-message-stack:empty) .goalix-chat-message-stack {
+    min-height: 0 !important;
+  }
+
+  .goalix-chat-messages:has(.goalix-chat-center + .goalix-chat-message-stack:empty) .goalix-chat-center {
+    min-height: 100% !important;
+  }
+}
+
 /* Login mobile/tablet menu: horizontal rail instead of a tall dropdown card. */
 @media (max-width: 1180px) {
   .goalix-login-mobile-actions + .goalix-login-mobile-dropdown,

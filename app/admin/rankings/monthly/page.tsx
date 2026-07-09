@@ -38,10 +38,10 @@ const roleCards: Array<{
   icon: typeof Goal;
   className: string;
 }> = [
-  { role: "attack", icon: Goal, className: "border-rose-400/35 bg-rose-500/10 text-rose-100" },
-  { role: "midfield", icon: Medal, className: "border-cyan-400/35 bg-cyan-500/10 text-cyan-100" },
-  { role: "defense", icon: Shield, className: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100" },
-  { role: "goalkeeper", icon: User, className: "border-amber-400/35 bg-amber-500/10 text-amber-100" },
+  { role: "attack", icon: Goal, className: "goalix-rank-role-card is-attack" },
+  { role: "midfield", icon: Medal, className: "goalix-rank-role-card is-midfield" },
+  { role: "defense", icon: Shield, className: "goalix-rank-role-card is-defense" },
+  { role: "goalkeeper", icon: User, className: "goalix-rank-role-card is-goalkeeper" },
 ];
 
 const monthlyCopy = {
@@ -226,21 +226,21 @@ export default function MonthlyRankingsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-bold">{t.roleTitles[config.role]}</p>
-                    <p className="mt-1 text-xs text-current/75">{t.roleLeader}</p>
+                    <p className="mt-1 text-xs goalix-rank-role-muted">{t.roleLeader}</p>
                   </div>
-                  <span className="rounded-md bg-black/15 p-2">
+                  <span className="goalix-rank-role-icon rounded-md p-2">
                     <Icon className="h-5 w-5" />
                   </span>
                 </div>
                 {leader ? (
                   <div className="mt-4">
                     <p className="truncate font-semibold">{leader.playerName}</p>
-                    <p className="text-xs text-current/75">
+                    <p className="text-xs goalix-rank-role-muted">
                       #{leader.rank} - {formatScore(leader.score)} {t.points} - {rankingWeeksInMonthLabel(leader.weekStarts, leader.month)}
                     </p>
                   </div>
                 ) : (
-                  <p className="mt-4 text-sm text-current/75">{t.noPlayerData}</p>
+                  <p className="mt-4 text-sm goalix-rank-role-muted">{t.noPlayerData}</p>
                 )}
               </CardContent>
             </Card>

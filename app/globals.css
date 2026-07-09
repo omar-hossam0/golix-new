@@ -8014,6 +8014,170 @@ html[data-goalix-dashboard-theme="dark"] :is(.goalix-dialog-content, .goalix-dro
   color-scheme: dark !important;
 }
 
+.goalix-dialog-overlay {
+  z-index: 10000 !important;
+}
+
+.goalix-dialog-content {
+  z-index: 10001 !important;
+}
+
+body:has(.goalix-dialog-content[data-state="open"]) .goalix-mobile-header,
+body:has(.goalix-dialog-content[data-state="open"]) .goalix-reference-topbar {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.goalix-rank-role-card {
+  border-color: color-mix(in srgb, var(--rank-role-accent) 28%, var(--border)) !important;
+  color: var(--rank-role-ink) !important;
+  background:
+    radial-gradient(circle at 94% 0%, color-mix(in srgb, var(--rank-role-accent) 14%, transparent), transparent 11rem),
+    color-mix(in srgb, var(--rank-role-accent) 10%, var(--card)) !important;
+}
+
+.goalix-rank-role-card.is-attack {
+  --rank-role-accent: #e11d48;
+  --rank-role-ink: #831843;
+  --rank-role-muted: #9f1239;
+}
+
+.goalix-rank-role-card.is-midfield {
+  --rank-role-accent: #0891b2;
+  --rank-role-ink: #164e63;
+  --rank-role-muted: #0e7490;
+}
+
+.goalix-rank-role-card.is-defense {
+  --rank-role-accent: #059669;
+  --rank-role-ink: #064e3b;
+  --rank-role-muted: #047857;
+}
+
+.goalix-rank-role-card.is-goalkeeper {
+  --rank-role-accent: #d97706;
+  --rank-role-ink: #78350f;
+  --rank-role-muted: #92400e;
+}
+
+.goalix-rank-role-card :is(p, span, strong) {
+  color: inherit !important;
+}
+
+.goalix-rank-role-card .goalix-rank-role-muted {
+  color: var(--rank-role-muted) !important;
+}
+
+.goalix-rank-role-card .goalix-rank-role-icon {
+  color: var(--rank-role-ink) !important;
+  background: color-mix(in srgb, var(--rank-role-accent) 16%, #ffffff) !important;
+}
+
+.goalix-reference-frame[data-dashboard-theme="dark"] .goalix-rank-role-card {
+  --rank-role-ink: color-mix(in srgb, var(--rank-role-accent) 22%, #f8fbff);
+  --rank-role-muted: color-mix(in srgb, var(--rank-role-accent) 34%, #d8e5f0);
+  border-color: color-mix(in srgb, var(--rank-role-accent) 36%, rgba(45, 154, 213, 0.18)) !important;
+  background:
+    radial-gradient(circle at 94% 0%, color-mix(in srgb, var(--rank-role-accent) 16%, transparent), transparent 11rem),
+    color-mix(in srgb, var(--rank-role-accent) 10%, #071b2c) !important;
+}
+
+.goalix-reference-frame[data-dashboard-theme="dark"] .goalix-rank-role-card .goalix-rank-role-icon {
+  color: var(--rank-role-ink) !important;
+  background: color-mix(in srgb, var(--rank-role-accent) 22%, rgba(255, 255, 255, 0.08)) !important;
+}
+
+/* Final dashboard mobile/tablet fit: full-bleed app shell, themed drawer brand, left-aligned submenus. */
+@media (max-width: 900px) {
+  html:has(.goalix-reference-frame),
+  body:has(.goalix-reference-frame) {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    background: var(--background) !important;
+  }
+
+  .goalix-dashboard-viewport {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .goalix-reference-frame {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-x: hidden !important;
+  }
+
+  .goalix-reference-main,
+  .goalix-reference-content {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .goalix-reference-content {
+    padding: 14px max(12px, env(safe-area-inset-left)) max(28px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right)) !important;
+  }
+
+  .goalix-reference-sidebar {
+    border-radius: 0 24px 24px 0 !important;
+  }
+
+  .goalix-reference-frame[data-dashboard-language="ar"] .goalix-reference-sidebar {
+    border-radius: 24px 0 0 24px !important;
+  }
+
+  .goalix-reference-sidebar .goalix-reference-brand {
+    width: 100% !important;
+    color: var(--dash-ink) !important;
+    background: color-mix(in srgb, var(--ref-surface) 92%, var(--dash-accent) 5%) !important;
+  }
+
+  .goalix-reference-frame[data-dashboard-theme="dark"] .goalix-reference-sidebar .goalix-reference-brand {
+    border-color: rgba(45, 154, 213, 0.18) !important;
+    color: #edf7ff !important;
+    background: linear-gradient(145deg, rgba(8, 31, 49, 0.96), rgba(6, 17, 31, 0.94)) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 28px rgba(0, 0, 0, 0.24) !important;
+  }
+
+  .goalix-reference-frame[data-dashboard-theme="dark"] .goalix-reference-sidebar .goalix-reference-brand strong {
+    color: #edf7ff !important;
+  }
+
+  .goalix-reference-frame[data-dashboard-theme="dark"] .goalix-reference-sidebar .goalix-reference-brand small {
+    color: #9fb2c5 !important;
+  }
+
+  .goalix-reference-sidebar .goalix-reference-subnav {
+    padding-left: 30px !important;
+    padding-right: 4px !important;
+  }
+
+  .goalix-reference-frame[data-dashboard-language="ar"] .goalix-reference-sidebar .goalix-reference-subnav {
+    padding-right: 30px !important;
+    padding-left: 4px !important;
+  }
+
+  .goalix-reference-sidebar .goalix-reference-subnav-link {
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+
+  .goalix-reference-frame[data-dashboard-language="ar"] .goalix-reference-sidebar .goalix-reference-subnav-link {
+    justify-content: flex-end !important;
+    text-align: right !important;
+  }
+}
+
 @media (max-width: 760px) {
   html:has(.goalix-login-system),
   body:has(.goalix-login-system) {

@@ -66,28 +66,28 @@ const roleCards: Array<{
     title: "Best Attack",
     description: "Top attacking role score",
     icon: Goal,
-    className: "border-rose-400/35 bg-rose-500/10 text-rose-100",
+    className: "goalix-rank-role-card is-attack",
   },
   {
     role: "midfield",
     title: "Best Midfield",
     description: "Top midfield role score",
     icon: Medal,
-    className: "border-cyan-400/35 bg-cyan-500/10 text-cyan-100",
+    className: "goalix-rank-role-card is-midfield",
   },
   {
     role: "defense",
     title: "Best Defense",
     description: "Top defensive role score",
     icon: Shield,
-    className: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
+    className: "goalix-rank-role-card is-defense",
   },
   {
     role: "goalkeeper",
     title: "Best Goalkeeper",
     description: "Top goalkeeper score",
     icon: User,
-    className: "border-amber-400/35 bg-amber-500/10 text-amber-100",
+    className: "goalix-rank-role-card is-goalkeeper",
   },
 ];
 
@@ -291,11 +291,11 @@ function MonthlyRoleCard({
             <p className="text-sm font-bold">
               {t.roleCards[config.role].title}
             </p>
-            <p className="mt-1 text-xs text-current/75">
+            <p className="mt-1 text-xs goalix-rank-role-muted">
               {t.roleCards[config.role].description}
             </p>
           </div>
-          <span className="rounded-md bg-black/15 p-2">
+          <span className="goalix-rank-role-icon rounded-md p-2">
             <Icon className="h-5 w-5" />
           </span>
         </div>
@@ -304,14 +304,14 @@ function MonthlyRoleCard({
             <PlayerAvatar name={row.playerName} />
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold">{row.playerName}</p>
-              <p className="text-xs text-current/75">
+              <p className="text-xs goalix-rank-role-muted">
                 #{row.rank} {t.monthly} - {scoreText(row.score)} {t.points} -{" "}
                 {rankingWeeksInMonthLabel(row.weekStarts, row.month)}
               </p>
             </div>
           </div>
         ) : (
-          <p className="mt-5 rounded-md border border-current/20 p-3 text-sm text-current/75">
+          <p className="mt-5 rounded-md border border-current/20 p-3 text-sm goalix-rank-role-muted">
             {t.noPlayerData}
           </p>
         )}

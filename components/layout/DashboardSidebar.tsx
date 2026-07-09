@@ -252,12 +252,6 @@ export function DashboardSidebar({
         </button>
       </div>
 
-      <div className="goalix-reference-download">
-        <div className="goalix-reference-download-art" />
-        <strong>{t("Goalix AI Coach")}</strong>
-        <p>{t("Daily insights for performance, attendance and match readiness.")}</p>
-        <button type="button">{t("Open Insights")}</button>
-      </div>
     </aside>
   );
 }
