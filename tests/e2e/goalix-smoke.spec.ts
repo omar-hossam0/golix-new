@@ -206,7 +206,9 @@ function mockData(pathname: string) {
     ];
   }
   if (pathname === "/api/v1/coach/groups") return [];
-  if (pathname === "/api/v1/auth/csrf") return { csrfToken: "e2e-csrf-token" };
+  if (pathname === "/api/v1/auth/csrf" || pathname === "/api/v1/csrf-token") {
+    return { csrfToken: "e2e-csrf-token" };
+  }
   return [];
 }
 
@@ -266,6 +268,44 @@ test.describe("Goalix public auth surfaces", () => {
     await page.goto("/admin-login");
     await expectNoClientCrash(page);
     await expectNoHorizontalOverflow(page);
+  });
+
+  test("admin login submits and navigates to the dashboard", async ({ page }) => {
+    await mockAuthenticatedApi(page, "admin");
+    await page.route("**/api/v1/auth/admin/login", async (route) => {
+      const request = route.request();
+      expect(request.method()).toBe("POST");
+      const body = request.postDataJSON() as Record<string, unknown>;
+      expect(body.username).toBe("e2eadmin");
+      expect(body.password).toBe("Password1!");
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        headers: {
+          "set-cookie": `accessToken=${signAccessCookie("admin")}; Path=/; HttpOnly; SameSite=Lax`,
+        },
+        body: JSON.stringify({
+          success: true,
+          data: {
+            user: users.admin,
+            mfaSetupRequired: false,
+          },
+        }),
+      });
+    });
+
+    await page.goto("/admin-login");
+    const staffIdentifier = page.locator("#staff-identifier");
+    const staffPassword = page.locator("#staff-password");
+    await staffIdentifier.fill("e2eadmin");
+    await staffPassword.fill("Password1!");
+    await expect(staffIdentifier).toHaveValue("e2eadmin");
+    await expect(staffPassword).toHaveValue("Password1!");
+    await page.getByRole("button", { name: /log in/i }).click();
+
+    await expect(page).toHaveURL(/\/admin\/dashboard/);
+    await expectNoClientCrash(page);
   });
 });
 

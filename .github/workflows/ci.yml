@@ -174,3 +174,34 @@ jobs:
             NEXT_PUBLIC_SOCKET_URL=
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy To VPS
+    needs: publish
+    runs-on: [self-hosted, linux, x64, goalix-vps, production]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 30
+    concurrency:
+      group: goalix-vps-production-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Deploy production stack
+        run: |
+          set -Eeuo pipefail
+
+          cd /opt/goalix/golix-new
+          git config --global --add safe.directory /opt/goalix/golix-new
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git stash push --include-untracked -m "pre-cd-deploy-$(date +%Y%m%d%H%M%S)"
+          fi
+
+          git fetch origin main
+          git checkout main
+          git pull --ff-only origin main
+
+          docker pull omarhossam2005/golix:main
+          GOALIX_IMAGE_TAG=main bash scripts/deploy-production.sh
+
+          curl -kfsS https://127.0.0.1/ready >/dev/null
+          curl -kfsS https://127.0.0.1/ >/dev/null
